@@ -1,11 +1,39 @@
 import cmd
+import csv
 import math
 import random
 import sys
 
+DEFAULT_PARTY_FILE = 'my-campaign.csv'
+DIFFICULTIES = [20, 40, 80, 120, 140, 180, 240, 280, 320, 440]
+SHOCK_CONSEQUENCES = [
+    '\n\t-1 Mental Health',
+    '\n\t-2 Mental Health',
+    '\n\t-3 Mental Health',
+    '\n\t-5 Mental Health',
+    '\n\t-8 Mental Health',
+    '\n\t-10 Mental Health',
+    '\n\t-15 Mental Health\n\tPHYSICAL SHOCK 60',
+    '\n\t-20 Mental Health\n\tPHYSICAL SHOCK 80\n\tMINOR TEMPORARY DERANGEMENT',
+    '\n\t-30 Mental Health\n\tPHYSICAL SHOCK 100\n\tMINOR TEMPORARY DERANGEMENT',
+    '\n\t-40 Mental Health\n\tPHYSICAL SHOCK 120\n\tMAJOR TEMOPRARY DERANGEMENT',
+    '\n\t-50 Mental Health\n\tPHYSICAL SHOCK 140\n\tMAJOR TEMPORARY DERANGEMENT'
+]
+
 def parse(arg):
     '''Convert a series of zero or more numbers to an argument tuple'''
     return tuple(map(int, arg.split()))
+
+def roll(score, open_roll=0):
+    base_roll = random.randint(1, 100)
+    if base_roll >= (90 + open_roll):
+        print('OPEN ROLL!')
+        return roll(score + base_roll, open_roll + 1)
+    elif (open_roll < 1) and ((score < 200 and base_roll < 4) or (base_roll < 3)):
+        print('FUMBLE...')
+        return base_roll - random.randint(1, 100)
+    else:
+        return score + base_roll
 
 def calc_attack(attack, defense, armor=0, base_damage=None):
     result = attack - defense
@@ -104,6 +132,33 @@ def calc_crit(damage_dealt, phr_roll, modifier=0, location_level=0):
         
         return s
 
+def calc_shock(composure, willpower, modifier=0):
+    if modifier < 8:
+        composure_difficulty = DIFFICULTIES[modifier + 1]
+    else:
+        composure_difficulty = DIFFICULTIES[-2]
+    composure_roll = roll(composure)
+    if composure_roll > composure_difficulty:
+        return 'RESISTED: COMPOSURE'
+    
+    shock_level = (willpower + random.randint(1, 10)) - (10 + modifier)
+    s = f'Level of failure: {shock_level}'
+    if shock_level > -1:
+        return s + '\n\tRESISTED: WILLPOWER'
+    elif shock_level > -11:
+        return s + SHOCK_CONSEQUENCES[abs(shock_level) - 1]
+    else:
+        return s + SHOCK_CONSEQUENCES[-1]
+
+def group_shock(modifier):
+    with open(DEFAULT_PARTY_FILE) as csvfile:
+        reader = csv.DictReader(csvfile)
+        s = []
+        for row in reader:
+            s.append(row['name'])
+            s.append(calc_shock(int(row['composure']), int(row['willpower']), modifier))
+    return '\n'.join(s)
+
 class AnimaShell(cmd.Cmd):
     intro = 'Engaging Anima toolkit'
     prompt = '(anima) '
@@ -118,6 +173,12 @@ class AnimaShell(cmd.Cmd):
     def do_crit(self, arg):
         'usage: damage_dealt phr_roll [modifier] [location_level]'
         print(calc_crit(*parse(arg)))
+    
+    def do_shock(self, arg):
+        print(calc_shock(*parse(arg)))
+    
+    def do_groupshock(self, arg):
+        print(group_shock(*parse(arg)))
         
     def do_exit(self, arg):
         'terminate session'

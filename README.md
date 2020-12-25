@@ -15,6 +15,8 @@ Please open an issue or contact me personally if you see any problems in the cal
 
 Below are several examples of using the commands, given examples from the Anima: Beyond Fantasy core book or illustrative examples I created.
 
+Optional arguments for every command must be specified in order. That is to say, for the `attack` command, you cannot specify `base_damage` without also specifying `armor`, even if `armor` is just 0.
+
 ### attack
 
 usage: attack_roll defense_roll [armor] [base_damage]
