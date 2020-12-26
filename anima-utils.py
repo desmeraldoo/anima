@@ -5,7 +5,6 @@ import random
 import sys
 
 DEFAULT_PARTY_FILE = 'my-campaign.csv'
-DIFFICULTIES = [20, 40, 80, 120, 140, 180, 240, 280, 320, 440]
 SHOCK_CONSEQUENCES = [
     '\n\t-1 Mental Health',
     '\n\t-2 Mental Health',
@@ -20,20 +19,18 @@ SHOCK_CONSEQUENCES = [
     '\n\t-50 Mental Health\n\tPHYSICAL SHOCK 140\n\tMAJOR TEMPORARY DERANGEMENT'
 ]
 
-def parse(arg):
+def parse(args):
     '''Convert a series of zero or more numbers to an argument tuple'''
-    return tuple(map(int, arg.split()))
+    return tuple(map(int, args.split()))
 
-def roll(score, open_roll=0):
+def roll(score, modifier=0, open_roll=0):
     base_roll = random.randint(1, 100)
-    if base_roll >= (90 + open_roll):
-        print('OPEN ROLL!')
-        return roll(score + base_roll, open_roll + 1)
+    if base_roll >= (90 + open_roll) or base_roll == 100:
+        return score + base_roll + modifier + roll(0, open_roll=open_roll + 1)
     elif (open_roll < 1) and ((score < 200 and base_roll < 4) or (base_roll < 3)):
-        print('FUMBLE...')
-        return base_roll - random.randint(1, 100)
+        return score + base_roll + modifier - random.randint(1, 100)
     else:
-        return score + base_roll
+        return score + base_roll + modifier
 
 def calc_attack(attack, defense, armor=0, base_damage=None):
     result = attack - defense
@@ -132,17 +129,18 @@ def calc_crit(damage_dealt, phr_roll, modifier=0, location_level=0):
         
         return s
 
-def calc_shock(composure, willpower, modifier=0):
-    if modifier < 8:
-        composure_difficulty = DIFFICULTIES[modifier + 1]
-    else:
-        composure_difficulty = DIFFICULTIES[-2]
+def calc_shock(composure, willpower, difficulty=10):
+    # This is a homebrew difficulty calculation that does not reflect the
+    # system as described in the Master's Tookit, which I found inconsistent. I
+    # tried to make it as similar as possible.
+    composure_difficulty = 20 + (difficulty * 10)
     composure_roll = roll(composure)
+    s = f'Composure roll {composure_roll} against difficulty {composure_difficulty}'
     if composure_roll > composure_difficulty:
-        return 'RESISTED: COMPOSURE'
+        return s + '\n\tRESISTED: COMPOSURE'
     
-    shock_level = (willpower + random.randint(1, 10)) - (10 + modifier)
-    s = f'Level of failure: {shock_level}'
+    shock_level = (willpower + random.randint(1, 10)) - (difficulty)
+    s += f'\nLevel of failure: {shock_level}'
     if shock_level > -1:
         return s + '\n\tRESISTED: WILLPOWER'
     elif shock_level > -11:
@@ -150,14 +148,29 @@ def calc_shock(composure, willpower, modifier=0):
     else:
         return s + SHOCK_CONSEQUENCES[-1]
 
-def group_shock(modifier):
+def group_shock(difficulty=10):
     with open(DEFAULT_PARTY_FILE) as csvfile:
         reader = csv.DictReader(csvfile)
         s = []
         for row in reader:
             s.append(row['name'])
-            s.append(calc_shock(int(row['composure']), int(row['willpower']), modifier))
+            s.append(calc_shock(int(row['composure']), int(row['willpower']), difficulty))
     return '\n'.join(s)
+
+def calc_notice(notice, difficulty, modifier=0):
+    notice_score = roll(notice, modifier)
+    return notice_score > difficulty
+    
+def group_notice(difficulty, modifier=0):
+    with open(DEFAULT_PARTY_FILE) as csvfile:
+        reader = csv.DictReader(csvfile)
+        s = []
+        for row in reader:
+            s.append(row['name'])
+            s.append(': ')
+            s.append(calc_notice(int(row['notice']), difficulty, modifier))
+            s.append('\n')
+    return ' '.join(s)
 
 class AnimaShell(cmd.Cmd):
     intro = 'Engaging Anima toolkit'
@@ -166,21 +179,30 @@ class AnimaShell(cmd.Cmd):
     def default(self, _):
         print('Input not recognized.')
     
-    def do_attack(self, arg):
+    def do_attack(self, args):
         'usage: attack_roll defense_roll [armor] [base_damage]'
-        print(calc_attack(*parse(arg)))
+        print(calc_attack(*parse(args)))
     
-    def do_crit(self, arg):
+    def do_crit(self, args):
         'usage: damage_dealt phr_roll [modifier] [location_level]'
-        print(calc_crit(*parse(arg)))
+        print(calc_crit(*parse(args)))
     
-    def do_shock(self, arg):
-        print(calc_shock(*parse(arg)))
+    def do_shock(self, args):
+        'usage: composure willpower [difficulty=10]'
+        print(calc_shock(*parse(args)))
     
-    def do_groupshock(self, arg):
-        print(group_shock(*parse(arg)))
+    def do_groupshock(self, args):
+        'usage: [difficulty=10]\nrequires user-defined file \'my-campaign.csv\' (see docs)'
+        print(group_shock(*parse(args)))
+    
+    def do_notice(self, args):
+        'usage: notice difficulty [modifier=0]'
+        print(calc_notice(*parse(args))
+    
+    def do_groupnotice(self, args):
+        'usage: difficulty [modifier=0]'
         
-    def do_exit(self, arg):
+    def do_exit(self, args):
         'terminate session'
         print('Ending session')
         return True
