@@ -23,11 +23,13 @@ def parse(args):
     '''Convert a series of zero or more numbers to an argument tuple'''
     return tuple(map(int, args.split()))
 
-def roll(score, modifier=0, open_roll=0):
+def roll(score, modifier=0, open_roll=0, name=''):
     base_roll = random.randint(1, 100)
     if base_roll >= (90 + open_roll) or base_roll == 100:
-        return score + base_roll + modifier + roll(0, open_roll=open_roll + 1)
+        print('OPEN ROLL!' if not name else f'OPEN ROLL: {name}')
+        return score + base_roll + modifier + roll(0, open_roll=open_roll + 1, name=name)
     elif (open_roll < 1) and ((score < 200 and base_roll < 4) or (base_roll < 3)):
+        print('FUMBLE...' if not name else f'FUMBLE: {name}')
         return score + base_roll + modifier - random.randint(1, 100)
     else:
         return score + base_roll + modifier
@@ -129,12 +131,12 @@ def calc_crit(damage_dealt, phr_roll, modifier=0, location_level=0):
         
         return s
 
-def calc_shock(composure, willpower, difficulty=10):
+def calc_shock(composure, willpower, difficulty=10, name=''):
     # This is a homebrew difficulty calculation that does not reflect the
     # system as described in the Master's Tookit, which I found inconsistent. I
     # tried to make it as similar as possible.
     composure_difficulty = 20 + (difficulty * 10)
-    composure_roll = roll(composure)
+    composure_roll = roll(composure, name=name)
     s = f'Composure roll {composure_roll} against difficulty {composure_difficulty}'
     if composure_roll > composure_difficulty:
         return s + '\n\tRESISTED: COMPOSURE'
@@ -154,12 +156,13 @@ def group_shock(difficulty=10):
         s = []
         for row in reader:
             s.append(row['name'])
-            s.append(calc_shock(int(row['composure']), int(row['willpower']), difficulty))
+            s.append(calc_shock(int(row['composure']), int(row['willpower']), difficulty, row['name']))
     return '\n'.join(s)
 
-def calc_notice(notice, difficulty, modifier=0):
-    notice_score = roll(notice, modifier)
-    return notice_score > difficulty
+def calc_notice(score, difficulty, modifier=0, name=''):
+    notice_score = roll(score, modifier, name=name)
+    notice_result = 'noticed' if notice_score > difficulty else 'missed'
+    return f'{notice_result} (score: {notice_score}, difficulty: {difficulty})'
     
 def group_notice(difficulty, modifier=0):
     with open(DEFAULT_PARTY_FILE) as csvfile:
@@ -168,7 +171,7 @@ def group_notice(difficulty, modifier=0):
         for row in reader:
             s.append(row['name'])
             s.append(': ')
-            s.append(calc_notice(int(row['notice']), difficulty, modifier))
+            s.append(calc_notice(int(row['notice']), difficulty, modifier, row['name']))
             s.append('\n')
     return ' '.join(s)
 
@@ -180,27 +183,28 @@ class AnimaShell(cmd.Cmd):
         print('Input not recognized.')
     
     def do_attack(self, args):
-        'usage: attack_roll defense_roll [armor] [base_damage]'
+        'usage: attack attack_roll defense_roll [armor] [base_damage]'
         print(calc_attack(*parse(args)))
     
     def do_crit(self, args):
-        'usage: damage_dealt phr_roll [modifier] [location_level]'
+        'usage: crit damage_dealt phr_roll [modifier] [location_level]'
         print(calc_crit(*parse(args)))
     
     def do_shock(self, args):
-        'usage: composure willpower [difficulty=10]'
+        'usage: shock composure willpower [difficulty=10]'
         print(calc_shock(*parse(args)))
     
     def do_groupshock(self, args):
-        'usage: [difficulty=10]\nrequires user-defined file \'my-campaign.csv\' (see docs)'
+        'usage: groupshock [difficulty=10]\nrequires user-defined file \'my-campaign.csv\' (see docs)'
         print(group_shock(*parse(args)))
     
     def do_notice(self, args):
-        'usage: notice difficulty [modifier=0]'
-        print(calc_notice(*parse(args))
+        'usage: notice score difficulty [modifier=0]'
+        print(calc_notice(*parse(args)))
     
     def do_groupnotice(self, args):
-        'usage: difficulty [modifier=0]'
+        'usage: groupnotice difficulty [modifier=0]\nrequires user-defined file \'my-campaign.csv\' (see docs)'
+        print(group_notice(*parse(args)))
         
     def do_exit(self, args):
         'terminate session'

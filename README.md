@@ -19,7 +19,7 @@ Optional arguments for every command must be specified in order. That is to say,
 
 ### attack
 
-usage: attack_roll defense_roll [armor] [base_damage]
+usage: attack attack_roll defense_roll [armor] [base_damage]
 * attack_roll: The result of the attacker's offensive roll (the sum of their Attack modifier and 1d100).
 * defense_roll: The result of the defender's defensive roll (the sum of their Defense modifier and 1d100).
 * armor: The relevant AT, given as an integer
@@ -41,7 +41,7 @@ DAMAGE: 36
 
 ### crit
 
-usage: damage_dealt phr_roll [modifier] [location_level]
+usage: crit damage_dealt phr_roll [modifier] [location_level]
 * damage_dealt: The damage dealt by the attacker to the victim of the critical hit.
 * phr_roll: The final result of the victim's Physical Resistance roll.
 * modifier: A modifier applied to increase or decrease the critical level before consequences are calculated—for example, if the attacker is using a critical-boosting Ki technique, or has a Power that increases the devastation caused by criticals.
