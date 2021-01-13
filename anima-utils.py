@@ -3,6 +3,7 @@ import csv
 import math
 import random
 import sys
+import pdb
 
 DEFAULT_PARTY_FILE = 'my-campaign.csv'
 SHOCK_CONSEQUENCES = [
@@ -25,7 +26,7 @@ def parse(args):
 
 def roll(score, modifier=0, open_roll=0, name=''):
     base_roll = random.randint(1, 100)
-    if base_roll >= (90 + open_roll) or base_roll == 100:
+    if open_roll > -1 and (base_roll >= (90 + open_roll) or base_roll == 100):
         print('OPEN ROLL!' if not name else f'OPEN ROLL: {name}')
         return score + base_roll + modifier + roll(0, open_roll=open_roll + 1, name=name)
     elif (open_roll < 1) and ((score < 200 and base_roll < 4) or (base_roll < 3)):
@@ -50,10 +51,9 @@ def calc_attack(attack, defense, armor=0, base_damage=None):
                 if result < 40:
                     damage_multiple = 0.1
                 else:
-                    damage_mtuliple = 0.2
+                    damage_multiple = 0.2
         else:
             damage_multiple = ((result // 10) / 10) - (armor * 0.1)
-        
         if damage_multiple <= 0:
             return 'DEFLECTED'
         elif not base_damage:
@@ -161,7 +161,7 @@ def group_shock(difficulty=10):
 
 def calc_notice(score, difficulty, modifier=0, name=''):
     notice_score = roll(score, modifier, name=name)
-    notice_result = 'noticed' if notice_score > difficulty else 'missed'
+    notice_result = 'noticed' if notice_score >= difficulty else 'missed'
     return f'{notice_result} (score: {notice_score}, difficulty: {difficulty})'
     
 def group_notice(difficulty, modifier=0):
@@ -174,6 +174,20 @@ def group_notice(difficulty, modifier=0):
             s.append(calc_notice(int(row['notice']), difficulty, modifier, row['name']))
             s.append('\n')
     return ' '.join(s)
+
+def calc_mr(score, difficulty, modifier=0, name=''):
+    resistance = roll(score, modifier, open_roll=-1, name=name)
+    resist_result = 'RESISTED' if resistance >= difficulty else 'AFFECTED'
+    return f'{resist_result} (score: {resistance}, difficulty: {difficulty})' 
+
+def group_mr(difficulty=80, modifier=0):
+    with open(DEFAULT_PARTY_FILE) as csvfile:
+        reader = csv.DictReader(csvfile)
+        s = []
+        for row in reader:
+            s.append(row['name'])
+            s.append(calc_mr(int(row['magicresist']), difficulty, modifier, row['name']))
+    return '\n'.join(s)
 
 class AnimaShell(cmd.Cmd):
     intro = 'Engaging Anima toolkit'
@@ -205,6 +219,10 @@ class AnimaShell(cmd.Cmd):
     def do_groupnotice(self, args):
         'usage: groupnotice difficulty [modifier=0]\nrequires user-defined file \'my-campaign.csv\' (see docs)'
         print(group_notice(*parse(args)))
+    
+    def do_groupmr(self, args):
+        'usage: groupmr difficulty [modifier=0]\nrequires user-defined file \'my-campaign.csv\' (see docs)'
+        print(group_mr(*parse(args)))
         
     def do_exit(self, args):
         'terminate session'

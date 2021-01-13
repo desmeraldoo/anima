@@ -51,7 +51,7 @@ usage: crit damage_dealt phr_roll [modifier] [location_level]
 > 
 > Muris rolls 70, and the merchant rolls only 13, so this is a dire blow with a critical level of 77. The GM rolls to determine the location of the critical, and their roll yields a 67, or the merchants left hand, which seems to have been badly broken in his failed attempt to block the strike.
 > 
-> Thus, in addition to the damage he received, the merchant suffers not only a -38 All Action Penalty that diminishes at a rate of 5 points per round for the duration of the encounter, but an additional -38 All Action Penalty that heals at a rate of 5 points per *week.* At the discretion of the GM, he may require further medical attention to heal and regain use of his hand. Though, perhaps he should count himself fortunate in one respect—if Muris's critical roll been just 25 points higher, the hand would have been crushed beyond repair.
+> Thus, in addition to the damage he received, the merchant suffers not only a -38 All Action Penalty that diminishes at a rate of 5 points per round for the duration of the encounter, but an additional -38 All Action Penalty that heals at a rate dependent on his Constitution, normally 5 points per day (see the core book, page 53). At the discretion of the GM, he may require further medical attention to heal and regain use of his hand. Though, perhaps he should count himself fortunate in one respect—if Muris's critical roll been just 25 points higher, the hand would have been crushed beyond repair.
 
 ```
 (anima) crit 50 30
