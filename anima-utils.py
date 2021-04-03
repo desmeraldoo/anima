@@ -19,6 +19,51 @@ SHOCK_CONSEQUENCES = [
     '\n\t-40 Mental Health\n\tPHYSICAL SHOCK 120\n\tMAJOR TEMOPRARY DERANGEMENT',
     '\n\t-50 Mental Health\n\tPHYSICAL SHOCK 140\n\tMAJOR TEMPORARY DERANGEMENT'
 ]
+POWERS = [
+    'Fatigue Resistance',
+    'Acute Senses',
+    'Attribute Increased',
+    'Unnatural Size',
+    'Inhumanity/Zen',
+    'Aquatic Breathing',
+    'Reduced Physical Needs',
+    'Natural Immunity to an Element',
+    'Psychological Immunity',
+    'Natural Weapons',
+    'Additional Attacks',
+    'Increased Damage',
+    'Increased Reaction',
+    'Damage Energy',
+    'Armor Modifier',
+    'Special Attack',
+    'Poisoned Attack',
+    'Added Mystical Effect',
+    'Increased Critical',
+    'Special Trapping',
+    'Supernatural Attack',
+    'Elemental Attack',
+    'Special Movement',
+    'Automatic Transport',
+    'Increased Movement',
+    'Natural Flight',
+    'Mystical Flight',
+    'Increased Physical Resistance',
+    'Mystical/Psychic Resistance',
+    'Regeneration',
+    'Physical Immunity',
+    'Magical Immunity',
+    'Matrix Immunity',
+    'Damage Barrier',
+    'Physical Armor',
+    'Mystical Armor',
+    'Innate Magic',
+    'Innate Psychic Abilities',
+    'Metamorphosis',
+    'Invisibility / Undetectable',
+    'Aura',
+    'Special Means of Vision',
+    'Supernatural Detection'
+]
 
 def parse(args):
     '''Convert a series of zero or more numbers to an argument tuple'''
@@ -189,6 +234,9 @@ def group_mr(difficulty=80, modifier=0):
             s.append(calc_mr(int(row['magicresist']), difficulty, modifier, row['name']))
     return '\n'.join(s)
 
+def chaotic_powers(num_powers=5):
+    return 'CHAOTIC POWERS:\n' + '\n'.join(random.choices(POWERS, k=num_powers))
+
 class AnimaShell(cmd.Cmd):
     intro = 'Engaging Anima toolkit'
     prompt = '(anima) '
@@ -223,6 +271,10 @@ class AnimaShell(cmd.Cmd):
     def do_groupmr(self, args):
         'usage: groupmr difficulty [modifier=0]\nrequires user-defined file \'my-campaign.csv\' (see docs)'
         print(group_mr(*parse(args)))
+    
+    def do_chaos(self, args):
+        'usage: chaos [num_powers]'
+        print(chaotic_powers(*parse(args)))
         
     def do_exit(self, args):
         'terminate session'
