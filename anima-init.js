@@ -1,7 +1,5 @@
 const AnimaInitiative = (() => {
   // eslint-disable-line no-unused-vars
-  log('DEBUG 0: script loaded');
-
   const scriptName = 'AnimaInitiative';
   const version = '0.0.1';
 
@@ -165,7 +163,7 @@ const AnimaInitiative = (() => {
         maxDecimal: 2,
         autoOpenInit: true,
         sortOption: 'Descending',
-        preserveFirst: false,
+        preserveFirst: true,
         announcer: 'Partial',
       },
     };
@@ -368,10 +366,6 @@ const AnimaInitiative = (() => {
         }
       },
     },
-  };
-
-  const buildInitDiceExpression = function (s) {
-    return 'd100';
   };
 
   const createHelpHandout = () => {
@@ -729,7 +723,7 @@ const AnimaInitiative = (() => {
       bonus = group.map((details) => {
         let stat = getAttrByName(charObj.id, details.attribute, details.type || 'current');
 
-        if (undefined === stat || null === stat) {
+        if (stat === null || stat === undefined) {
           stat = undefined;
         } else if (!Number.isNaN(Number(stat))) {
           stat = parseFloat(stat);
@@ -747,7 +741,7 @@ const AnimaInitiative = (() => {
 
       if (_.contains(bonus, undefined) || _.contains(bonus, null) || _.contains(bonus, NaN)) {
         bonus = '';
-        console.log('Could not find bonus!');
+        log('DEBUG: Could not find bonus!');
         return false;
       }
       bonus = bonus.join('+');
