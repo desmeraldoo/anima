@@ -1,7 +1,9 @@
 const AnimaInitiative = (() => {
   // eslint-disable-line no-unused-vars
-  const scriptName = 'AnimaInitiative';
-  const version = '0.0.1';
+  const ScriptName = 'AnimaInitiative';
+  const Version = '0.0.1';
+  const HelpIconUrl =
+    'https://s3.amazonaws.com/files.d20.io/images/127392204/tAiDP73rpSKQobEYm5QZUw/thumb.png?15878425385';
 
   const isString = (s) => 'string' === typeof s || s instanceof String;
   const isFunction = (f) => 'function' === typeof f;
@@ -145,13 +147,12 @@ const AnimaInitiative = (() => {
   };
 
   const initScript = function () {
-    state[scriptName] = {
-      lastHelpVersion: version,
+    state[ScriptName] = {
       savedTurnOrders: [],
       config: {
         rollType: 'Individual-Roll',
         replaceRoll: true,
-        maxDecimal: 2,
+        maxDecimal: 0,
         autoOpenInit: true,
         sortOption: 'Descending',
         preserveFirst: true,
@@ -287,7 +288,7 @@ const AnimaInitiative = (() => {
         let groups = buildAnnounceGroups(l);
         if (groups.npc.length || groups.character.length || groups.gmlayer.length) {
           sendChat(
-            scriptName,
+            ScriptName,
             '/w gm ' +
               '<div>' +
               groups.character.join('') +
@@ -305,13 +306,13 @@ const AnimaInitiative = (() => {
         let groups = buildAnnounceGroups(l);
         if (groups.character.length) {
           sendChat(
-            scriptName,
+            ScriptName,
             '/direct ' + '<div>' + groups.character.join('') + '<div style="clear:both;"></div>' + '</div>'
           );
         }
         if (groups.npc.length || groups.gmlayer.length) {
           sendChat(
-            scriptName,
+            ScriptName,
             '/w gm ' +
               '<div>' +
               groups.npc.join('') +
@@ -328,7 +329,7 @@ const AnimaInitiative = (() => {
         let groups = buildAnnounceGroups(l);
         if (groups.npc.length || groups.character.length) {
           sendChat(
-            scriptName,
+            ScriptName,
             '/direct ' +
               '<div>' +
               groups.character.join('') +
@@ -339,7 +340,7 @@ const AnimaInitiative = (() => {
         }
         if (groups.gmlayer.length) {
           sendChat(
-            scriptName,
+            ScriptName,
             '/w gm ' + '<div>' + groups.gmlayer.join('') + '<div style="clear:both;"></div>' + '</div>'
           );
         }
@@ -348,13 +349,10 @@ const AnimaInitiative = (() => {
   };
 
   const createHelpHandout = () => {
-    const helpIcon =
-      'https://s3.amazonaws.com/files.d20.io/images/127392204/tAiDP73rpSKQobEYm5QZUw/thumb.png?15878425385';
-
     // find handout
-    let props = { type: 'handout', name: `Help: ${scriptName}` };
+    let props = { type: 'handout', name: `Help: ${ScriptName}` };
     if (findObjs(props)[0]) {
-      createObj('handout', Object.assign(props, { avatar: helpIcon }));
+      createObj('handout', Object.assign(props, { avatar: HelpIconUrl }));
     }
   };
 
@@ -366,13 +364,6 @@ const AnimaInitiative = (() => {
             `Rolls initiative for the selected tokens and adds them to the Turn Order if they don${ch(
               "'"
             )}t have a turn yet.`
-          ),
-          _h.paragraph(
-            `The calculation of initiative is handled by the combination of Roller (See ${_h.bold(
-              'Roller Options'
-            )} below) and a Bonus.  The Bonus is determined based on an ordered list of Stat Groups (See ${_h.bold(
-              'Bonus Stat Groups'
-            )} below).  Stat Groups are evaluated in order.  The bonus computed by the first Stat Group for which all attributes exist and have a numeric value is used.  This allows you to have several Stat Groups that apply to different types of characters.  In practice you will probably only have one, but more are there if you need them.`
           )
         ),
         helpParts.commands(context)
@@ -423,60 +414,11 @@ const AnimaInitiative = (() => {
         )
       ),
 
-    stackCommands: (/*context*/) =>
-      _h.section(
-        'Commands for Stacks of Initiative',
-        _h.paragraph(
-          `AnimaInitiative provides a system called ${_h.bold(
-            'Stacks'
-          )} which lets you store collections of prerolled initiative values and combine or cycle them as desired.`
-        ),
-        _h.inset(
-          _h.font.command(`!anima-init`, `--stack`, _h.optional('operation'), _h.optional('label')),
-          _h.inset(
-            _h.minorhead('Available Operations:'),
-            _h.ul(
-              `${_h.bold('list')} -- Displays the stack of saved Turn Orders. (default)`,
-              `${_h.bold('clear')} -- Clears the stack of saved Turn Orders.`,
-              `${_h.bold(
-                `copy${ch('|')}dup ${ch('[')}label${ch(']')}`
-              )} -- Adds a copy of the current Turn Order to the stack.`,
-              `${_h.bold(
-                `push ${ch('[')}label${ch(']')}`
-              )} -- Adds a copy of the current Turn Order to the stack and clears the Turn Order.  Anything after the command will be used as a label for the entry.`,
-              `${_h.bold(
-                'pop'
-              )} -- Replaces the current Turn Order with the last entry in the stack removing it from the stack.`,
-              `${_h.bold(
-                'apply'
-              )} -- Replaces the current Turn Order with the last entry in the stack leaving it on the stack.`,
-              `${_h.bold(
-                `swap ${ch('[')}label${ch(']')}`
-              )} -- Swaps the current Turn Order with the last entry in the stack.  Anything after the command will be used as a label for the entry placed in the stack.`,
-              `${_h.bold(
-                `tswap${ch('|')}tail-swap ${ch('[')}label${ch(']')}`
-              )} -- Swaps the current Turn Order with the first entry in the stack.  Anything after the command will be used as a label for the entry placed in the stack.`,
-              `${_h.bold(
-                'merge'
-              )} -- Removes the last entry in the stack and adds it to the current Turn Order and sorts the new Turn Order with the configured sort method.`,
-              `${_h.bold(
-                `apply-merge${ch('|')}amerge`
-              )} -- Merges the last entry in the stack with the current Turn Order and sorts the new Turn Order with the configured sort method, leaving the stack unchanged.`,
-              `${_h.bold(
-                `rotate${ch('|')}rot ${ch('[')}label${ch(']')}`
-              )} -- Pushes the current Turn Order onto the end of the stack and restores the first entry from the stack to the Turn Order.  Anything after the command will be used as a label for the entry placed in the stack.`,
-              `${_h.bold(
-                `reverse-rotate${ch('|')}rrot ${ch('[')}label${ch(']')}`
-              )} -- Pushes the current Turn Order onto the beginning of the stack and restores the last entry from the stack to the Turn Order.  Anything after the command will be used as a label for the entry placed in the stack.`
-            )
-          )
-        )
-      ),
     turnOrderCommands: (/*context*/) =>
       _h.section(
         'Commands for Turn Order Management',
         _h.paragraph(
-          `The Turn Order is an integral part of initiative, so AnimaInitiative provides soem methodes for manipulating it.`
+          `The Turn Order is an integral part of initiative, so AnimaInitiative provides some methods for manipulating it.`
         ),
         _h.inset(
           _h.font.command(`!anima-init`, `--toggle-turnorder`),
@@ -494,8 +436,7 @@ const AnimaInitiative = (() => {
         _h.subhead('Commands'),
         helpParts.rollingCommands(context),
         helpParts.helpCommands(context),
-        helpParts.turnOrderCommands(context),
-        helpParts.stackCommands(context)
+        helpParts.turnOrderCommands(context)
       ),
 
     sortOptionsConfig: (/* context */) =>
@@ -513,7 +454,7 @@ const AnimaInitiative = (() => {
             ...Object.keys(sorters).map(
               (s) =>
                 `${_h.ui.float(
-                  s === state[scriptName].config.sortOption
+                  s === state[ScriptName].config.sortOption
                     ? _h.ui.bubble(_h.bold('Selected'))
                     : _h.ui.button(`Use ${s}`, `!anima-init-config --sort-option|${s}`)
                 )}${_h.bold(s)} -- ${sorters[s].desc}${_h.ui.clear()}`
@@ -533,10 +474,10 @@ const AnimaInitiative = (() => {
             `${_h.ui.float(
               _h.ui.button(
                 'Set Max Decimal',
-                `!anima-init-config --set-max-decimal|?{Maximum number of decimal places:|${state[scriptName].config.maxDecimal}}`
+                `!anima-init-config --set-max-decimal|?{Maximum number of decimal places:|${state[ScriptName].config.maxDecimal}}`
               )
             )}Maximum Decimal Places is currently set to ${_h.bold(
-              state[scriptName].config.maxDecimal
+              state[ScriptName].config.maxDecimal
             )}. ${_h.ui.clear()}`
           )
         )
@@ -549,11 +490,11 @@ const AnimaInitiative = (() => {
           _h.paragraph(
             `${_h.ui.float(
               _h.ui.button(
-                state[scriptName].config.autoOpenInit ? 'Disable' : 'Enable',
+                state[ScriptName].config.autoOpenInit ? 'Disable' : 'Enable',
                 `!anima-init-config --toggle-auto-open-init`
               )
             )}Auto Open Turn Order is currently ${_h.bold(
-              state[scriptName].config.autoOpenInit ? 'On' : 'Off'
+              state[ScriptName].config.autoOpenInit ? 'On' : 'Off'
             )}. ${_h.ui.clear()}`
           )
         )
@@ -568,11 +509,11 @@ const AnimaInitiative = (() => {
           _h.paragraph(
             `${_h.ui.float(
               _h.ui.button(
-                state[scriptName].config.replaceRoll ? 'Disable' : 'Enable',
+                state[ScriptName].config.replaceRoll ? 'Disable' : 'Enable',
                 `!anima-init-config --toggle-replace-roll`
               )
             )}Replace Roll is currently ${_h.bold(
-              state[scriptName].config.replaceRoll ? 'On' : 'Off'
+              state[ScriptName].config.replaceRoll ? 'On' : 'Off'
             )}. ${_h.ui.clear()}`
           )
         )
@@ -587,11 +528,11 @@ const AnimaInitiative = (() => {
           _h.paragraph(
             `${_h.ui.float(
               _h.ui.button(
-                state[scriptName].config.preserveFirst ? 'Disable' : 'Enable',
+                state[ScriptName].config.preserveFirst ? 'Disable' : 'Enable',
                 `!anima-init-config --toggle-preserve-first`
               )
             )}Preserve First on Sorted Add is currently ${_h.bold(
-              state[scriptName].config.preserveFirst ? 'On' : 'Off'
+              state[ScriptName].config.preserveFirst ? 'On' : 'Off'
             )}. ${_h.ui.clear()}`
           )
         )
@@ -605,7 +546,7 @@ const AnimaInitiative = (() => {
             ...Object.keys(announcers).map(
               (a) =>
                 `${_h.ui.float(
-                  a === state[scriptName].config.announcer
+                  a === state[ScriptName].config.announcer
                     ? _h.ui.bubble(_h.bold('Selected'))
                     : _h.ui.button(`Use ${a}`, `!anima-init-config --set-announcer|${a}`)
                 )}${_h.bold(a)} -- ${announcers[a].desc}${_h.ui.clear()}`
@@ -627,12 +568,12 @@ const AnimaInitiative = (() => {
         )
       ),
 
-    helpConfig: (context) => _h.outer(_h.title(scriptName, version), helpParts.configuration(context)),
+    helpConfig: (context) => _h.outer(_h.title(ScriptName, Version), helpParts.configuration(context)),
 
-    helpDoc: (context) => _h.join(_h.title(scriptName, version), helpParts.helpBody(context)),
+    helpDoc: (context) => _h.join(_h.title(ScriptName, Version), helpParts.helpBody(context)),
 
     helpChat: (context) =>
-      _h.outer(_h.title(scriptName, version), helpParts.helpBody(context), helpParts.configuration(context))
+      _h.outer(_h.title(ScriptName, Version), helpParts.helpBody(context), helpParts.configuration(context))
   };
 
   const showHelp = (playerid) => {
@@ -707,7 +648,7 @@ const AnimaInitiative = (() => {
     let turnorder = Campaign().get('turnorder');
 
     turnorder = '' === turnorder ? [] : JSON.parse(turnorder);
-    if (state[scriptName].config.replaceRoll || options.isReroll) {
+    if (state[ScriptName].config.replaceRoll || options.isReroll) {
       turnorder = turnorder.filter((e) => !ids.includes(e.id));
     }
 
@@ -755,14 +696,14 @@ const AnimaInitiative = (() => {
 
       Campaign().set({
         turnorder: JSON.stringify(
-          sorters[state[scriptName].config.sortOption].func(
+          sorters[state[ScriptName].config.sortOption].func(
             turnorder.concat(
               _.chain(rollSetup)
                 .map(function (s) {
                   s.rollResults = turnEntries.shift();
                   return s;
                 })
-                .tap(announcers[state[scriptName].config.announcer].func)
+                .tap(announcers[state[ScriptName].config.announcer].func)
                 .map(function (s) {
                   return {
                     id: s.token.id,
@@ -772,13 +713,13 @@ const AnimaInitiative = (() => {
                 })
                 .value()
             ),
-            state[scriptName].config.preserveFirst
+            state[ScriptName].config.preserveFirst
           )
         )
       });
       notifyObservers('turnOrderChange', Campaign().get('turnorder'), options.prev);
 
-      if (state[scriptName].config.autoOpenInit && !Campaign().get('initativepage')) {
+      if (state[ScriptName].config.autoOpenInit && !Campaign().get('initativepage')) {
         Campaign().set({
           initiativepage: pageid
         });
@@ -794,7 +735,7 @@ const AnimaInitiative = (() => {
           total:
             ird.results.total % 1 === 0
               ? ird.results.total
-              : parseFloat(ird.results.total.toFixed(state[scriptName].config.maxDecimal)),
+              : parseFloat(ird.results.total.toFixed(state[ScriptName].config.maxDecimal)),
           rolls: _.reduce(
             ird.results.rolls,
             function (m, rs) {
@@ -828,7 +769,7 @@ const AnimaInitiative = (() => {
           );
 
         rdata.bonus =
-          rdata.bonus % 1 === 0 ? rdata.bonus : parseFloat(rdata.bonus.toFixed(state[scriptName].config.maxDecimal));
+          rdata.bonus % 1 === 0 ? rdata.bonus : parseFloat(rdata.bonus.toFixed(state[ScriptName].config.maxDecimal));
 
         turnEntries.push(rdata);
 
@@ -939,7 +880,7 @@ const AnimaInitiative = (() => {
               Campaign().set(
                 'turnorder',
                 JSON.stringify(
-                  sorters[state[scriptName].config.sortOption].func(
+                  sorters[state[ScriptName].config.sortOption].func(
                     JSON.parse(Campaign().get('turnorder')) || [],
                     false
                   )
@@ -965,7 +906,7 @@ const AnimaInitiative = (() => {
                         e.pr = Math.max(
                           (_.isNaN(parseFloat(e.pr)) ? 0 : parseFloat(e.pr)) + manualBonus,
                           manualBonusMin
-                        ).toFixed(state[scriptName].config.maxDecimal);
+                        ).toFixed(state[ScriptName].config.maxDecimal);
                       }
                       return e;
                     })
@@ -974,7 +915,7 @@ const AnimaInitiative = (() => {
                 notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
               } else {
                 sendChat(
-                  scriptName,
+                  ScriptName,
                   `/w "${who}" ` +
                     '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
                     'Not a valid adjustment: <b>' +
@@ -1001,7 +942,7 @@ const AnimaInitiative = (() => {
                         e.pr = Math.max(
                           (_.isNaN(parseFloat(e.pr)) ? 0 : parseFloat(e.pr)) + manualBonus,
                           manualBonusMin
-                        ).toFixed(state[scriptName].config.maxDecimal);
+                        ).toFixed(state[ScriptName].config.maxDecimal);
                       }
                       return e;
                     })
@@ -1010,7 +951,7 @@ const AnimaInitiative = (() => {
                 notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
               } else {
                 sendChat(
-                  scriptName,
+                  ScriptName,
                   `/w "${who}" ` +
                     '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
                     'Not a valid adjustment: <b>' +
@@ -1027,7 +968,7 @@ const AnimaInitiative = (() => {
               }
               Campaign().set({
                 turnorder: '[]',
-                initiativepage: state[scriptName].config.autoOpenInit ? false : Campaign().get('initiativepage')
+                initiativepage: state[ScriptName].config.autoOpenInit ? false : Campaign().get('initiativepage')
               });
               notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
               break;
@@ -1038,7 +979,7 @@ const AnimaInitiative = (() => {
                 cont = true;
               } else {
                 sendChat(
-                  scriptName,
+                  ScriptName,
                   `/w "${who}" ` +
                     '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
                     'Not a valid bonus: <b>' +
@@ -1054,7 +995,7 @@ const AnimaInitiative = (() => {
                 return;
               }
               sendChat(
-                scriptName,
+                ScriptName,
                 `/w "${who}" ` +
                   '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
                   'Not a valid command: <b>' +
@@ -1095,7 +1036,7 @@ const AnimaInitiative = (() => {
           switch (opt.shift()) {
             case 'sort-option':
               if (sorters[opt[0]]) {
-                state[scriptName].config.sortOption = opt[0];
+                state[ScriptName].config.sortOption = opt[0];
               } else {
                 omsg = '<div><b>Error:</b> Not a valid sort method: ' + opt[0] + '</div>';
               }
@@ -1111,7 +1052,7 @@ const AnimaInitiative = (() => {
 
             case 'set-max-decimal':
               if (opt[0].match(/^\d+$/)) {
-                state[scriptName].config.maxDecimal = parseInt(opt[0], 10);
+                state[ScriptName].config.maxDecimal = parseInt(opt[0], 10);
               } else {
                 omsg = '<div><b>Error:</b> Not a valid decimal count: ' + opt[0] + '</div>';
               }
@@ -1126,7 +1067,7 @@ const AnimaInitiative = (() => {
               break;
 
             case 'toggle-auto-open-init':
-              state[scriptName].config.autoOpenInit = !state[scriptName].config.autoOpenInit;
+              state[ScriptName].config.autoOpenInit = !state[ScriptName].config.autoOpenInit;
               sendChat(
                 '',
                 `/w "${who}" ` +
@@ -1137,7 +1078,7 @@ const AnimaInitiative = (() => {
               break;
 
             case 'toggle-replace-roll':
-              state[scriptName].config.replaceRoll = !state[scriptName].config.replaceRoll;
+              state[ScriptName].config.replaceRoll = !state[ScriptName].config.replaceRoll;
               sendChat(
                 '',
                 `/w "${who}" ` +
@@ -1148,7 +1089,7 @@ const AnimaInitiative = (() => {
               break;
 
             case 'toggle-preserve-first':
-              state[scriptName].config.preserveFirst = !state[scriptName].config.preserveFirst;
+              state[ScriptName].config.preserveFirst = !state[ScriptName].config.preserveFirst;
               sendChat(
                 '',
                 `/w "${who}" ` +
@@ -1160,7 +1101,7 @@ const AnimaInitiative = (() => {
 
             case 'set-announcer':
               if (announcers[opt[0]]) {
-                state[scriptName].config.announcer = opt[0];
+                state[ScriptName].config.announcer = opt[0];
               } else {
                 omsg = '<div><b>Error:</b> Not a valid announcer: ' + opt[0] + '</div>';
               }
