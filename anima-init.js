@@ -6,6 +6,11 @@ const AnimaInitiative = (() => {
   const isString = (s) => 'string' === typeof s || s instanceof String;
   const isFunction = (f) => 'function' === typeof f;
 
+  const InitDie = 'd100';
+  const InitAttribute = 'repeating_initiative_$0_init_final';
+  const CharacterFailAttribute = 'f_base';
+  const CharacterSuccessAttribute = 'or_base';
+
   const DefaultCharacterFumble = 3;
   const DefaultCharacterOpenRoll = 90;
 
@@ -16,13 +21,13 @@ const AnimaInitiative = (() => {
   const ColorWhite = 'white';
 
   let observers = {
-    turnOrderChange: [],
+    turnOrderChange: []
   };
 
   const sorters = {
     None: {
       desc: `No sorting is applied.`,
-      func: (to) => to,
+      func: (to) => to
     },
     Ascending: {
       desc: `Sorts the Turn Order from highest to lowest`,
@@ -35,7 +40,7 @@ const AnimaInitiative = (() => {
           newTo = [...newTo.slice(idx), ...newTo.slice(0, idx)];
         }
         return newTo;
-      },
+      }
     },
     Descending: {
       desc: `Sorts the Turn Order from lowest to highest.`,
@@ -48,8 +53,8 @@ const AnimaInitiative = (() => {
           newTo = [...newTo.slice(idx), ...newTo.slice(0, idx)];
         }
         return newTo;
-      },
-    },
+      }
+    }
   };
 
   const ch = (c) => {
@@ -67,7 +72,7 @@ const AnimaInitiative = (() => {
       '"': 'quot',
       '*': 'ast',
       '/': 'sol',
-      ' ': 'nbsp',
+      ' ': 'nbsp'
     };
 
     if (entities.hasOwnProperty(c)) {
@@ -89,12 +94,12 @@ const AnimaInitiative = (() => {
       '}': e('#125'),
       '[': e('#91'),
       ']': e('#93'),
-      '"': e('quot'),
+      '"': e('quot')
     };
     const re = new RegExp(`(${Object.keys(entities).map(esRE).join('|')})`, 'g');
     return (s) => s.replace(re, (c) => entities[c] || c);
   })();
-  
+
   const _h = {
     outer: (...o) =>
       `<div style="border: 1px solid black; background-color: white; padding: 3px 3px;">${o.join(' ')}</div>`,
@@ -123,49 +128,35 @@ const AnimaInitiative = (() => {
       bare: (o) => `${ch('@')}${ch('{')}${o}${ch('}')}`,
       selected: (o) => `${ch('@')}${ch('{')}selected${ch('|')}${o}${ch('}')}`,
       target: (o) => `${ch('@')}${ch('{')}target${ch('|')}${o}${ch('}')}`,
-      char: (o, c) => `${ch('@')}${ch('{')}${c || 'CHARACTER NAME'}${ch('|')}${o}${ch('}')}`,
+      char: (o, c) => `${ch('@')}${ch('{')}${c || 'CHARACTER NAME'}${ch('|')}${o}${ch('}')}`
     },
     bold: (...o) => `<b>${o.join(' ')}</b>`,
     italic: (...o) => `<i>${o.join(' ')}</i>`,
     font: {
-      command: (...o) => `<b><span style="font-family:serif;">${o.join(' ')}</span></b>`,
+      command: (...o) => `<b><span style="font-family:serif;">${o.join(' ')}</span></b>`
     },
     ui: {
       float: (t) => `<div style="display:inline-block;float:right">${t}</div>`,
       clear: () => `<div style="clear:both;"></div>`,
       bubble: (label) =>
         `<span style="display:inline-block;border:1px solid #999; border-radius: 1em; padding: .1em 1em; font-weight:bold; background-color: #009688;color:white">${label}</span>`,
-      button: (label, link) => `<a href="${link}">${label}</a>`,
-    },
+      button: (label, link) => `<a href="${link}">${label}</a>`
+    }
   };
-  
+
   const initScript = function () {
-    initStat = [
-      [
-        {
-          attribute: 'repeating_initiative_$0_init_final',
-        },
-      ],
-    ];
     state[scriptName] = {
       lastHelpVersion: version,
-      bonusStatGroups: initStat,
       savedTurnOrders: [],
       config: {
         rollType: 'Individual-Roll',
         replaceRoll: true,
-        dieSize: 100,
-        diceCount: 1,
-        criticalSuccess: 90,
-        criticalFailure: 3,
-        characterFailAttribute: 'f_base',
-        characterSuccessAttribute: 'or_base',
         maxDecimal: 2,
         autoOpenInit: true,
         sortOption: 'Descending',
         preserveFirst: true,
-        announcer: 'Partial',
-      },
+        announcer: 'Partial'
+      }
     };
     createHelpHandout();
   };
@@ -184,31 +175,19 @@ const AnimaInitiative = (() => {
 
   const formatDieRoll = function (rollData, character) {
     // The following can fail if the tokens are not properly hooked up to the character sheets.
-    var characterFail = character
-      ? parseInt(getAttrByName(character.id, state[scriptName].config.characterFailAttribute))
-      : DefaultCharacterFumble;
-    var characterSuccess = character
-      ? parseInt(getAttrByName(character.id, state[scriptName].config.characterSuccessAttribute))
-      : DefaultCharacterOpenRoll;
+    var characterFail = findCharacterOpenRoll(character);
+    var characterSuccess = findCharacterFumble(character);
     var critFail = _.reduce(
       rollData.rolls,
       function (m, r) {
-        return (
-          m ||
-          (characterFail && r.rolls.some((roll) => roll <= characterFail)) ||
-          r.rolls.some((roll) => roll <= state[scriptName].config.criticalFailure)
-        );
+        return m || r.rolls.some((roll) => roll <= characterFail);
       },
       false
     );
     var critSuccess = _.reduce(
       rollData.rolls,
       function (m, r) {
-        return (
-          m ||
-          (characterSuccess && r.rolls.some((roll) => roll >= characterSuccess)) ||
-          r.rolls.some((roll) => roll >= state[scriptName].config.criticalSuccess)
-        );
+        return m || r.rolls.some((roll) => roll >= characterSuccess);
       },
       false
     );
@@ -257,7 +236,7 @@ const AnimaInitiative = (() => {
     var groupColors = {
       npc: '#eef',
       character: '#efe',
-      gmlayer: '#aaa',
+      gmlayer: '#aaa'
     };
     return _.reduce(
       l,
@@ -300,7 +279,7 @@ const AnimaInitiative = (() => {
   const announcers = {
     None: {
       desc: `Shows nothing in chat when a roll is made.`,
-      func: () => {},
+      func: () => {}
     },
     Hidden: {
       desc: `Whispers all rolls to the GM, regardless of who controls the tokens.`,
@@ -318,7 +297,7 @@ const AnimaInitiative = (() => {
               '</div>'
           );
         }
-      },
+      }
     },
     Partial: {
       desc: `Character rolls are shown in chat (Player controlled tokens), all others are whispered to the GM.`,
@@ -341,7 +320,7 @@ const AnimaInitiative = (() => {
               '</div>'
           );
         }
-      },
+      }
     },
     Visible: {
       desc: `Rolls for tokens on the Objects Layer are shown to all in chat.  Tokens on the GM Layer have their rolls whispered to the GM. `,
@@ -364,8 +343,8 @@ const AnimaInitiative = (() => {
             '/w gm ' + '<div>' + groups.gmlayer.join('') + '<div style="clear:both;"></div>' + '</div>'
           );
         }
-      },
-    },
+      }
+    }
   };
 
   const createHelpHandout = () => {
@@ -635,30 +614,6 @@ const AnimaInitiative = (() => {
         )
       ),
 
-    showBonusStatGroupsConfig: (/*context*/) =>
-      _h.section(
-        'Bonus Stat Groups',
-        _h.inset(
-          _h.ol(
-            ...state[scriptName].bonusStatGroups.map(
-              (a, n) =>
-                `${_h.ui.float(_h.ui.button(`+`, `!anima-init --promote ${n + 1}`))}${_h.ui.float(
-                  _h.ui.button(`X`, `!anima-init --del-group ${n + 1}`)
-                )}${a
-                  .map((e) =>
-                    _h.ui.bubble(
-                      (e.adjustments || []).reduce(
-                        (m, adj) => `${adj}( ${m} )`,
-                        `${e.attribute}|${e.type || 'current'}`
-                      )
-                    )
-                  )
-                  .join(' + ')}${_h.ui.clear()}`
-            )
-          )
-        )
-      ),
-
     configuration: (context) =>
       _h.join(
         _h.subhead('Configuration'),
@@ -668,8 +623,7 @@ const AnimaInitiative = (() => {
           helpParts.maxDecimalConfig(context),
           helpParts.autoOpenInitConfig(context),
           helpParts.replaceRollConfig(context),
-          helpParts.announcerConfig(context),
-          helpParts.showBonusStatGroupsConfig(context)
+          helpParts.announcerConfig(context)
         )
       ),
 
@@ -678,14 +632,14 @@ const AnimaInitiative = (() => {
     helpDoc: (context) => _h.join(_h.title(scriptName, version), helpParts.helpBody(context)),
 
     helpChat: (context) =>
-      _h.outer(_h.title(scriptName, version), helpParts.helpBody(context), helpParts.configuration(context)),
+      _h.outer(_h.title(scriptName, version), helpParts.helpBody(context), helpParts.configuration(context))
   };
 
   const showHelp = (playerid) => {
     const who = (getObj('player', playerid) || { get: () => 'API' }).get('_displayname');
     let context = {
       who,
-      playerid,
+      playerid
     };
     sendChat('', '/w "' + who + '" ' + helpParts.helpChat(context));
   };
@@ -717,37 +671,22 @@ const AnimaInitiative = (() => {
     return stext;
   };
 
-  const findInitiativeBonus = (charObj, token) => {
-    let bonus = 0;
-    state[scriptName].bonusStatGroups.find((group) => {
-      bonus = group.map((details) => {
-        let stat = getAttrByName(charObj.id, details.attribute, details.type || 'current');
+  const findCharacterOpenRoll = (character) => {
+    return character ? parseInt(getAttrByName(character.id, CharacterFailAttribute)) : DefaultCharacterFumble;
+  };
 
-        if (stat === null || stat === undefined) {
-          stat = undefined;
-        } else if (!Number.isNaN(Number(stat))) {
-          stat = parseFloat(stat);
-        } else if (isString(stat)) {
-          stat = parseEmbeddedStatReferences(stat, charObj);
-          stat = stat.length ? stat : 0;
-        } else {
-          stat = undefined;
-        }
+  const findCharacterFumble = (character) => {
+    return character ? parseInt(getAttrByName(character.id, CharacterSuccessAttribute)) : DefaultCharacterOpenRoll;
+  };
 
-        return (details.adjustments || []).reduce((memo, a) => {
-          return memo;
-        }, stat);
-      });
-
-      if (_.contains(bonus, undefined) || _.contains(bonus, null) || _.contains(bonus, NaN)) {
-        bonus = '';
-        log('DEBUG: Could not find bonus!');
-        return false;
-      }
-      bonus = bonus.join('+');
-      return true;
-    });
-    return bonus;
+  const findInitiativeBonus = (character) => {
+    var stat = getAttrByName(character.id, InitAttribute, 'current');
+    var bonus = stat && !Number.isNaN(Number(stat)) ? parseFloat(stat) : undefined;
+    if (bonus) {
+      return bonus;
+    }
+    log('ERROR: Could not find initiative bonus!');
+    return 0;
   };
 
   const rollForTokenIDsExternal = (ids, options) => {
@@ -757,7 +696,7 @@ const AnimaInitiative = (() => {
           makeRollsForIDs(ids, {
             isReroll: false,
             prev: Campaign().get('turnorder'),
-            manualBonus: parseFloat(options && options.manualBonus) || 0,
+            manualBonus: parseFloat(options && options.manualBonus) || 0
           }),
         0
       );
@@ -774,27 +713,24 @@ const AnimaInitiative = (() => {
 
     let turnorderIDS = turnorder.map((e) => e.id);
 
-    let initFunc = () => 'd100';
-
     let rollSetup = ids
       .filter((id) => !turnorderIDS.includes(id))
       .map((id) => getObj('graphic', id))
       .filter((g) => undefined !== g)
       .map((g) => ({
         token: g,
-        character: getObj('character', g.get('represents')),
+        character: getObj('character', g.get('represents'))
       }))
       .map((g) => {
         g.roll = [];
 
-        let bonus = findInitiativeBonus(g.character || {}, g.token);
-        bonus = isString(bonus) ? (bonus.trim().length ? bonus : '0') : bonus;
+        let bonus = findInitiativeBonus(g.character || {});
         g.roll.push(bonus);
 
         if (options.manualBonus) {
           g.roll.push(options.manualBonus);
         }
-        g.roll.push(initFunc(g));
+        g.roll.push(InitDie);
         return g;
       });
 
@@ -809,7 +745,7 @@ const AnimaInitiative = (() => {
             return _.isString(r) && _.isEmpty(r);
           }).join(') + (') +
           ')]]'
-        ).replace(/\[\[\[/g, '[[ ['),
+        ).replace(/\[\[\[/g, '[[ [')
       };
     });
 
@@ -831,20 +767,20 @@ const AnimaInitiative = (() => {
                   return {
                     id: s.token.id,
                     pr: s.rollResults.total,
-                    custom: '',
+                    custom: ''
                   };
                 })
                 .value()
             ),
             state[scriptName].config.preserveFirst
           )
-        ),
+        )
       });
       notifyObservers('turnOrderChange', Campaign().get('turnorder'), options.prev);
 
       if (state[scriptName].config.autoOpenInit && !Campaign().get('initativepage')) {
         Campaign().set({
-          initiativepage: pageid,
+          initiativepage: pageid
         });
       }
     });
@@ -865,13 +801,13 @@ const AnimaInitiative = (() => {
               if ('R' === rs.type) {
                 m.push({
                   sides: rs.sides,
-                  rolls: _.pluck(rs.results, 'v'),
+                  rolls: _.pluck(rs.results, 'v')
                 });
               }
               return m;
             },
             []
-          ),
+          )
         };
 
         rdata.bonus =
@@ -917,7 +853,7 @@ const AnimaInitiative = (() => {
 
     let context = {
       who,
-      playerid: msg.playerid,
+      playerid: msg.playerid
     };
 
     let ids = [];
@@ -963,275 +899,13 @@ const AnimaInitiative = (() => {
               }
               break;
 
-            case 'stack':
-              {
-                if (!playerIsGM(msg.playerid)) {
-                  return;
-                }
-                cmds.shift();
-                let operation = cmds.shift(),
-                  showdate = function (ms) {
-                    let ds = Math.round((_.now() - ms) / 1000),
-                      str = [];
-
-                    if (ds > 86400) {
-                      str.push(`${Math.round(ds / 86400)}d`);
-                      ds %= 86400;
-                    }
-                    if (ds > 3600) {
-                      str.push(`${Math.round(ds / 3600)}h`);
-                      ds %= 3600;
-                    }
-
-                    if (ds > 60) {
-                      str.push(`${Math.round(ds / 60)}m`);
-                      ds %= 60;
-                    }
-                    str.push(`${Math.round(ds)}s`);
-
-                    return str.join(' ');
-                  },
-                  stackrecord = function (label) {
-                    let toRaw = Campaign().get('turnorder'),
-                      to = JSON.parse(toRaw) || [],
-                      summary = _.chain(to)
-                        .map((o) => {
-                          return {
-                            entry: o,
-                            token: getObj('graphic', o.id),
-                          };
-                        })
-                        .map((o) => {
-                          return {
-                            img: o.token ? o.token.get('imgsrc') : '',
-                            name: o.token ? o.token.get('name') : o.entry.custom,
-                            pr: o.entry.pr,
-                          };
-                        })
-                        .value();
-
-                    return {
-                      label: label || (to.length ? `{${to.length} records}` : '{empty}'),
-                      date: _.now(),
-                      summary: summary,
-                      turnorder: toRaw,
-                    };
-                  },
-                  toMiniDisplay = function (summary) {
-                    return (
-                      '<div style="border: 1px solid #ccc;border-radius:.5em;padding:.5em;background-color:#eee;">' +
-                      _.map(summary, (sume) => {
-                        return `<div style="border-bottom: 1px solid #ccc;clear:both;"><div style="float:right;font-weight:bold;">${
-                          sume.pr
-                        }</div><img style="max-height:1.5em;float:left;" src="${sume.img}">${
-                          sume.name || '&' + 'nbsp;'
-                        }</div>`;
-                      }).join('') +
-                      '</div>'
-                    );
-                  },
-                  stacklist = function () {
-                    sendChat(
-                      '',
-                      `/w "${who}" ` +
-                        '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;"><ol>' +
-                        _.map(
-                          state[scriptName].savedTurnOrders,
-                          (o) => `<li>${o.label} [${showdate(o.date)}]${toMiniDisplay(o.summary)}</li>`
-                        ).join('') +
-                        '</ol></div>'
-                    );
-                  };
-                switch (operation) {
-                  case 'dup':
-                  case 'copy':
-                    // take current Turn Order and put it on top.
-                    state[scriptName].savedTurnOrders.push(stackrecord(cmds.join(' ')));
-                    stacklist();
-                    break;
-                  case 'push':
-                    // take current Turn Order and put it on top.
-                    state[scriptName].savedTurnOrders.push(stackrecord(cmds.join(' ')));
-                    Campaign().set('turnorder', '[]');
-                    notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                    stacklist();
-                    break;
-                  case 'pop':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders.pop();
-                      Campaign().set('turnorder', sto.turnorder);
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    } else {
-                      sendChat(
-                        '!anima-init --stack pop',
-                        `/w "${who}" ` +
-                          '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
-                          'No Saved Turn Orders to restore!' +
-                          '</div>'
-                      );
-                    }
-                    break;
-                  case 'apply':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders[0];
-                      Campaign().set('turnorder', sto.turnorder);
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    } else {
-                      sendChat(
-                        '!anima-init --stack pop',
-                        `/w "${who}" ` +
-                          '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
-                          'No Saved Turn Orders to apply!' +
-                          '</div>'
-                      );
-                    }
-                    break;
-                  case 'rot':
-                  case 'rotate':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders.shift();
-                      state[scriptName].savedTurnOrders.push(stackrecord(cmds.join(' ')));
-                      Campaign().set('turnorder', sto.turnorder);
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    }
-                    break;
-                  case 'rrot':
-                  case 'reverse-rotate':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders.pop();
-                      state[scriptName].savedTurnOrders.unshift(stackrecord(cmds.join(' ')));
-                      Campaign().set('turnorder', sto.turnorder);
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    }
-                    break;
-                  case 'swap':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders.shift();
-                      state[scriptName].savedTurnOrders.unshift(stackrecord(cmds.join(' ')));
-                      Campaign().set('turnorder', sto.turnorder);
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    }
-                    break;
-                  case 'tswap':
-                  case 'tail-swap':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders.pop();
-                      state[scriptName].savedTurnOrders.push(stackrecord(cmds.join(' ')));
-                      Campaign().set('turnorder', sto.turnorder);
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    }
-                    break;
-                  case 'amerge':
-                  case 'apply-merge':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders[0];
-
-                      Campaign().set(
-                        'turnorder',
-                        JSON.stringify(
-                          sorters[state[scriptName].config.sortOption].func(
-                            _.union(JSON.parse(Campaign().get('turnorder')) || [], JSON.parse(sto.turnorder) || []),
-                            state[scriptName].config.preserveFirst
-                          )
-                        )
-                      );
-
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    }
-                    break;
-                  case 'merge':
-                    if (state[scriptName].savedTurnOrders.length) {
-                      let sto = state[scriptName].savedTurnOrders.pop();
-
-                      Campaign().set(
-                        'turnorder',
-                        JSON.stringify(
-                          sorters[state[scriptName].config.sortOption].func(
-                            _.union(JSON.parse(Campaign().get('turnorder')) || [], JSON.parse(sto.turnorder) || []),
-                            state[scriptName].config.preserveFirst
-                          )
-                        )
-                      );
-
-                      notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
-                      stacklist();
-                    }
-                    break;
-
-                  case 'clear':
-                    state[scriptName].savedTurnOrders = [];
-                    break;
-
-                  default:
-                  case 'list':
-                    stacklist();
-                    break;
-                }
-              }
-              break;
-
-            case 'promote':
-              if (!playerIsGM(msg.playerid)) {
-                return;
-              }
-              cmds[1] = Math.max(parseInt(cmds[1], 10), 1);
-              if (state[scriptName].bonusStatGroups.length >= cmds[1]) {
-                if (1 !== cmds[1]) {
-                  workvar = state[scriptName].bonusStatGroups[cmds[1] - 1];
-                  state[scriptName].bonusStatGroups[cmds[1] - 1] = state[scriptName].bonusStatGroups[cmds[1] - 2];
-                  state[scriptName].bonusStatGroups[cmds[1] - 2] = workvar;
-                }
-
-                sendChat(scriptName, `/w "${who}" ${helpParts.showBonusStatGroupsConfig(context)}`);
-              } else {
-                sendChat(
-                  '!anima-init --promote',
-                  `/w "${who}" ` +
-                    '<div style="padding:1px 3px;border: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
-                    'Please specify one of the following by number:' +
-                    helpParts.showBonusStatGroupsConfig(context) +
-                    '</div>'
-                );
-              }
-              break;
-
-            case 'del-group':
-              if (!playerIsGM(msg.playerid)) {
-                return;
-              }
-              cmds[1] = Math.max(parseInt(cmds[1], 10), 1);
-              if (state[scriptName].bonusStatGroups.length >= cmds[1]) {
-                state[scriptName].bonusStatGroups = _.filter(state[scriptName].bonusStatGroups, function (v, k) {
-                  return k !== cmds[1] - 1;
-                });
-
-                sendChat(scriptName, `/w "${who}" ${helpParts.showBonusStatGroupsConfig(context)}`);
-              } else {
-                sendChat(
-                  '!anima-init --del-group',
-                  `/w "${who}" ` +
-                    '<div style="padding:1px 3px;bhttps://raytheon.benefitcenter.com/v3/client_docs/en_us/rth/HealthAdvocate_Top_Ten_Reasons.pdforder: 1px solid #8B4513;background: #eeffee; color: #8B4513; font-size: 80%;">' +
-                    'Please specify one of the following by number:' +
-                    helpParts.showBonusStatGroupsConfig(context) +
-                    '</div>'
-                );
-              }
-              break;
-
             case 'toggle-turnorder':
               if (!playerIsGM(msg.playerid)) {
                 return;
               }
               if (false !== Campaign().get('initiativepage')) {
                 Campaign().set({
-                  initiativepage: false,
+                  initiativepage: false
                 });
               } else {
                 let player = getObj('player', msg.playerid) || { get: () => true };
@@ -1240,7 +914,7 @@ const AnimaInitiative = (() => {
                   pid = Campaign().get('playerpageid');
                 }
                 Campaign().set({
-                  initiativepage: pid,
+                  initiativepage: pid
                 });
               }
               break;
@@ -1295,7 +969,7 @@ const AnimaInitiative = (() => {
                       }
                       return e;
                     })
-                  ),
+                  )
                 });
                 notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
               } else {
@@ -1331,7 +1005,7 @@ const AnimaInitiative = (() => {
                       }
                       return e;
                     })
-                  ),
+                  )
                 });
                 notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
               } else {
@@ -1353,7 +1027,7 @@ const AnimaInitiative = (() => {
               }
               Campaign().set({
                 turnorder: '[]',
-                initiativepage: state[scriptName].config.autoOpenInit ? false : Campaign().get('initiativepage'),
+                initiativepage: state[scriptName].config.autoOpenInit ? false : Campaign().get('initiativepage')
               });
               notifyObservers('turnOrderChange', Campaign().get('turnorder'), prev);
               break;
@@ -1431,22 +1105,6 @@ const AnimaInitiative = (() => {
                   '<div style="border: 1px solid black; background-color: white; padding: 3px 3px;">' +
                   omsg +
                   helpParts.sortOptionsConfig(context) +
-                  '</div>'
-              );
-              break;
-
-            case 'set-die-size':
-              if (opt[0].match(/^\d+$/)) {
-                state[scriptName].config.dieSize = parseInt(opt[0], 10);
-              } else {
-                omsg = '<div><b>Error:</b> Not a die size: ' + opt[0] + '</div>';
-              }
-              sendChat(
-                '',
-                `/w "${who}" ` +
-                  '<div style="border: 1px solid black; background-color: white; padding: 3px 3px;">' +
-                  omsg +
-                  helpParts.dieSizeConfig(context) +
                   '</div>'
               );
               break;
@@ -1536,6 +1194,6 @@ const AnimaInitiative = (() => {
 
   return {
     ObserveTurnOrderChange: observeTurnOrderChange,
-    RollForTokenIDs: rollForTokenIDsExternal,
+    RollForTokenIDs: rollForTokenIDsExternal
   };
 })();
