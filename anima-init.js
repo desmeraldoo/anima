@@ -22,6 +22,22 @@ const AnimaInitiative = (() => {
   const ColorYellow = '#FFD800';
   const ColorWhite = 'white';
 
+  const initScript = function () {
+    state[ScriptName] = {
+      savedTurnOrders: [],
+      config: {
+        rollType: 'Individual-Roll',
+        replaceRoll: true,
+        maxDecimal: 0,
+        autoOpenInit: true,
+        sortOption: 'Descending',
+        preserveFirst: false,
+        announcer: 'Partial'
+      }
+    };
+    createHelpHandout();
+  };
+
   let observers = {
     turnOrderChange: []
   };
@@ -144,22 +160,6 @@ const AnimaInitiative = (() => {
         `<span style="display:inline-block;border:1px solid #999; border-radius: 1em; padding: .1em 1em; font-weight:bold; background-color: #009688;color:white">${label}</span>`,
       button: (label, link) => `<a href="${link}">${label}</a>`
     }
-  };
-
-  const initScript = function () {
-    state[ScriptName] = {
-      savedTurnOrders: [],
-      config: {
-        rollType: 'Individual-Roll',
-        replaceRoll: true,
-        maxDecimal: 0,
-        autoOpenInit: true,
-        sortOption: 'Descending',
-        preserveFirst: true,
-        announcer: 'Partial'
-      }
-    };
-    createHelpHandout();
   };
 
   const observeTurnOrderChange = function (handler) {

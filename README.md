@@ -41,11 +41,10 @@ DAMAGE: 36
 
 ### crit
 
-usage: crit damage_dealt phr_roll [modifier] [location_level]
-* damage_dealt: The damage dealt by the attacker to the victim of the critical hit.
+usage: crit level phr_roll [location_id]
+* level: The level of the critical, which is the sum of the damage dealt, any critical modifier, and 1d100 rolled by the attacker.
 * phr_roll: The final result of the victim's Physical Resistance roll.
-* modifier: A modifier applied to increase or decrease the critical level before consequences are calculated—for example, if the attacker is using a critical-boosting Ki technique, or has a Power that increases the devastation caused by criticals.
-* location_level: A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations.
+* location_id: A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations.
 
 > Muris has just accosted a shopkeeper who was badgering him about his five-finger discount. The shopkeeper doesn't expect his swift sucker punch, so Muris succeeds in his attack and causes 50 damage. The merchant, having only 90 LP, suffers a critical blow, and two more rolls are required to determine the extent of the damage. Muris rolls 1d100 and adds it to the damage caused, and the merchant makes a Physical Resistance Check, using his PhR score of 30 as a base.
 > 
@@ -54,7 +53,7 @@ usage: crit damage_dealt phr_roll [modifier] [location_level]
 > Thus, in addition to the damage he received, the merchant suffers not only a -38 All Action Penalty that diminishes at a rate of 5 points per round for the duration of the encounter, but an additional -38 All Action Penalty that heals at a rate dependent on his Constitution, normally 5 points per day (see the core book, page 53). At the discretion of the GM, he may require further medical attention to heal and regain use of his hand. Though, perhaps he should count himself fortunate in one respect—if Muris's critical roll been just 25 points higher, the hand would have been crushed beyond repair.
 
 ```
-(anima) crit 50 30
+(anima) crit 120 30
 CRIT LEVEL 77
         MAJOR CRITICAL [Left arm (Hand)]
         ALL ACTION PENALTY (-38)
