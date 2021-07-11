@@ -155,7 +155,7 @@ const AnimaInitiative = (() => {
         maxDecimal: 0,
         autoOpenInit: true,
         sortOption: 'Descending',
-        preserveFirst: true,
+        preserveFirst: false,
         announcer: 'Partial'
       }
     };
