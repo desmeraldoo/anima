@@ -66,65 +66,65 @@ def calc_combo():
     return '\n'.join(results) + f'\nTOTAL DAMAGE: {total_damage}'
 
 def calc_crit(level, phr_roll, location_id=0):
-    if crit_level > 200: crit_level -= (crit_level - 200) // 2
-    crit_level -= phr_roll
+    if level > 200: level -= (level - 200) // 2
+    level -= phr_roll
     
-    if not location_level: location_level = random.randint(1, 100)
+    if not location_id: location_id = random.randint(1, 100)
     location = ''
-    if location_level < 11:
+    if location_id < 11:
         location = 'Torso (Ribs)'
-    elif location_level < 21:
+    elif location_id < 21:
         location = 'Torso (Shoulder)'
-    elif location_level < 31:
+    elif location_id < 31:
         location = 'Torso (Stomach)'
-    elif location_level < 36:
+    elif location_id < 36:
         location = 'Torso (Kidneys)'
-    elif location_level < 49:
+    elif location_id < 49:
         location = 'Torso (Chest)'
-    elif location_level < 51:
+    elif location_id < 51:
         location = 'Torso (Heart)'
-    elif location_level < 55:
+    elif location_id < 55:
         location = 'Right arm (Upper forearm)'
-    elif location_level < 59:
+    elif location_id < 59:
         location = 'Right arm (Lower forearm)'
-    elif location_level < 61:
+    elif location_id < 61:
         location = 'Right arm (Hand)'
-    elif location_level < 65:
+    elif location_id < 65:
         location = 'Left arm (Upper forearm)'
-    elif location_level < 69:
+    elif location_id < 69:
         location = 'Left arm (Lower forearm)'
-    elif location_level < 71:
+    elif location_id < 71:
         location = 'Left arm (Hand)'
-    elif location_level < 75:
+    elif location_id < 75:
         location = 'Right leg (Thigh)'
-    elif location_level < 79:
+    elif location_id < 79:
         location = 'Right leg (Calf)'
-    elif location_level < 81:
+    elif location_id < 81:
         location = 'Right leg (Foot)'
-    elif location_level < 85:
+    elif location_id < 85:
         location = 'Left leg (Thigh)'
-    elif location_level < 89:
+    elif location_id < 89:
         location = 'Left leg (Calf)'
-    elif location_level < 91:
+    elif location_id < 91:
         location = 'Left leg (Foot)'
     else:
         location = 'Head'
     
-    s = f'CRIT LEVEL {crit_level}'    
-    if crit_level < 1:
+    s = f'CRIT LEVEL {level}'    
+    if level < 1:
         return s + '\n\tNO FURTHER EFFECT'
-    elif crit_level < 51:
-        return s + f'\n\tMINOR CRITICAL\n\tALL ACTION PENALTY (-{crit_level})'
+    elif level < 51:
+        return s + f'\n\tMINOR CRITICAL\n\tALL ACTION PENALTY (-{level})'
     else:
-        s += f'\n\tMAJOR CRITICAL [{location}]\n\tALL ACTION PENALTY (-{crit_level // 2})\n\tALL ACTION SACRIFICE (-{crit_level // 2})'
+        s += f'\n\tMAJOR CRITICAL [{location}]\n\tALL ACTION PENALTY (-{level // 2})\n\tALL ACTION SACRIFICE (-{level // 2})'
         
-        if crit_level > 100:
-            if location_level > 90 or (location_level == 49 or location_level == 50):
+        if level > 100:
+            if location_id > 90 or (location_id == 49 or location_id == 50):
                 s += '\n\tINSTANT DEATH'
-            elif location_level > 50 and location_level < 91:
+            elif location_id > 50 and location_id < 91:
                 s += '\n\tAMPUTATION'
         
-            if crit_level > 150:
+            if level > 150:
                 s += '\n\tUNCONCIOUS -- AT RISK OF DEATH'
         
         return s
