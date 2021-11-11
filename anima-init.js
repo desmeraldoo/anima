@@ -173,11 +173,53 @@ const AnimaInitiative = (() => {
       handler(obj, prev);
     });
   };
+  
+  const getFumblePenalty = function(fumbled, roll) {
+	if (!fumbled) { return 0; }
+    switch (roll) {
+		case 1:
+			return 125;
+		case 2:
+			return 100;
+		default:
+			return 75;
+	};
+  };
+  
+  const rollD100 = function() {
+	return Math.floor(Math.random() * 101); 
+  };
+  
+  const autoOpenRoll = function(roll, threshold) {
+	if (roll < threshold) { return { bonus: 0, span: '' } };
+	let bonus = 0;
+	let lastRoll = roll;
+	let span = '(<span style="font-weight:bold;">'
+	while (lastRoll >= threshold) {
+		lastRoll = rollD100();
+		bonus += lastRoll;
+		span += lastRoll.toString() + ' + ';
+		threshold = threshold >= 100 ? threshold : threshold + 1;
+	}
+	span = span.slice(0, -3);
+	span += '</span>) [open roll]';
+	span = span.includes('+') ? span : span.replace('(', '').replace(')', '');
+	span = ' + ' + span;
+	return { bonus: bonus, span: span };
+  };
+  
+  const fumbleSpan = function(fumbled, roll) {
+    if (fumbled) {
+		return ' <span style="font-weight:bold;"> - ' + getFumblePenalty(
+			fumbled, roll).toString() + '</span> [fumble]';
+	}
+	return '';
+  };
 
   const formatDieRoll = function (rollData, character) {
     // The following can fail if the tokens are not properly hooked up to the character sheets.
-    var characterFail = findCharacterOpenRoll(character);
-    var characterSuccess = findCharacterFumble(character);
+    var characterFail = findCharacterFumble(character);
+    var characterSuccess = findCharacterOpenRoll(character);
     var critFail = _.reduce(
       rollData.rolls,
       function (m, r) {
@@ -200,7 +242,7 @@ const AnimaInitiative = (() => {
           r.rolls,
           function (dm, dr) {
             var dielight = dr <= characterFail ? ColorRed : dr >= characterSuccess ? ColorGreen : ColorWhite;
-            dm.push('<span style="font-weight:bold;color:' + dielight + ';">' + dr + '</span>');
+			dm.push('<span style="font-weight:bold;color:' + dielight + ';">' + dr + '</span>');
             return dm;
           },
           m
@@ -209,6 +251,8 @@ const AnimaInitiative = (() => {
       },
       []
     ).join(' + ');
+
+	let openRollData = autoOpenRoll(rollData.rolls[0].rolls[0], characterSuccess);
 
     return (
       '<span class="inlinerollresult showtip tipsy" style="min-width:1em;display: inline-block; border: 2px solid ' +
@@ -224,11 +268,13 @@ const AnimaInitiative = (() => {
             ' <span style="font-weight:bold;">' +
             Math.abs(rollData.bonus) +
             '</span> [bonus]' +
+			openRollData.span +
+			fumbleSpan(critFail, rollData.rolls[0].rolls[0]) +
             '</span>'
         )
       ) +
       '">' +
-      rollData.total +
+      (parseFloat(rollData.total) + openRollData.bonus - getFumblePenalty(critFail, rollData.rolls[0].rolls[0])).toString() +
       '</span>'
     );
   };
@@ -613,11 +659,11 @@ const AnimaInitiative = (() => {
   };
 
   const findCharacterOpenRoll = (character) => {
-    return character ? parseInt(getAttrByName(character.id, CharacterFailAttribute)) : DefaultCharacterFumble;
+    return character ? parseInt(getAttrByName(character.id, CharacterSuccessAttribute)) : DefaultCharacterOpenRoll;
   };
 
   const findCharacterFumble = (character) => {
-    return character ? parseInt(getAttrByName(character.id, CharacterSuccessAttribute)) : DefaultCharacterOpenRoll;
+    return character ? parseInt(getAttrByName(character.id, CharacterFailAttribute)) : DefaultCharacterFumble;
   };
 
   const findInitiativeBonus = (character) => {
