@@ -208,7 +208,7 @@ const AnimaInitiative = (() => {
 	return { bonus: bonus, span: span };
   };
   
-  const fumbleSpan = function(fumbled, roll) {
+  const getFumbleSpan = function(fumbled, roll) {
     if (fumbled) {
 		return ' <span style="font-weight:bold;"> - ' + getFumblePenalty(
 			fumbled, roll).toString() + '</span> [fumble]';
@@ -252,7 +252,11 @@ const AnimaInitiative = (() => {
       []
     ).join(' + ');
 
+	let fumbleSpan = getFumbleSpan(critFail, rollData.rolls[0].rolls[0]);
 	let openRollData = autoOpenRoll(rollData.rolls[0].rolls[0], characterSuccess);
+	let newTotal = parseFloat(rollData.total) + openRollData.bonus - getFumblePenalty(critFail, rollData.rolls[0].rolls[0]);
+	rollData.rolls[0].rolls[0] = newTotal;
+	rollData.total = newTotal;
 
     return (
       '<span class="inlinerollresult showtip tipsy" style="min-width:1em;display: inline-block; border: 2px solid ' +
@@ -269,12 +273,12 @@ const AnimaInitiative = (() => {
             Math.abs(rollData.bonus) +
             '</span> [bonus]' +
 			openRollData.span +
-			fumbleSpan(critFail, rollData.rolls[0].rolls[0]) +
+			fumbleSpan +
             '</span>'
         )
       ) +
       '">' +
-      (parseFloat(rollData.total) + openRollData.bonus - getFumblePenalty(critFail, rollData.rolls[0].rolls[0])).toString() +
+      newTotal.toString() +
       '</span>'
     );
   };
@@ -739,7 +743,6 @@ const AnimaInitiative = (() => {
     let turnEntries = [];
     let finalize = _.after(initRolls.length, function () {
       turnEntries = _.sortBy(turnEntries, 'order');
-
       Campaign().set({
         turnorder: JSON.stringify(
           sorters[state[ScriptName].config.sortOption].func(
@@ -749,7 +752,7 @@ const AnimaInitiative = (() => {
                   s.rollResults = turnEntries.shift();
                   return s;
                 })
-                .tap(announcers[state[ScriptName].config.announcer].func)
+				.tap(announcers[state[ScriptName].config.announcer].func)
                 .map(function (s) {
                   return {
                     id: s.token.id,
