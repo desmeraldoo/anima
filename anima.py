@@ -15,8 +15,7 @@ def calc_damage_multiple(result, armor):
     '''NOTE: Assumes result is greater than 0.'''
     if result > 29:
         if armor < 2 and result < 50:
-            # special rules for absorption
-            if armor == 1:
+            if armor == 0:
                 if result < 40:
                     return 0.1
                 else:
