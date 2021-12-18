@@ -129,7 +129,30 @@ def calc_crit(level, phr_roll, location_id=0):
         return s
 
 def chaotic_powers(num_powers=5):
-    return 'CHAOTIC POWERS:\n' + '\n'.join(random.choices(POWERS, k=num_powers))
+    return 'CHAOTIC POWERS:\n' + '\n'.join(random.sample(POWERS, num_powers))
+
+def mass_combat(num, lp, damage_resistant=0):
+    if damage_resistant:
+        base_lp = max(int(math.floor(lp / 100.0)) * 100, 100)
+        fixed_lp = base_lp // 2
+        if num > 50:
+            result = base_lp + fixed_lp * 49
+            if lp > 1000:
+                result += 250 * (num - 50)
+            else:
+                result += 100 * (num - 50)
+        else:
+            result = base_lp + (fixed_lp * (num - 1))
+    else:
+        if num > 100:
+            result = max(int(math.floor(lp / 50.0)) * 50, 50) * 100
+            if lp > 250:
+                result += 25 * (num - 100)
+            else:
+                result += 10 * (num - 100)
+        else:
+            result = max(int(math.floor(lp / 50.0)) * 50, 50) * num
+    return result
 
 class AnimaShell(cmd.Cmd):
     intro = 'Engaging Anima toolkit'
@@ -153,6 +176,10 @@ class AnimaShell(cmd.Cmd):
     def do_chaos(self, args):
         'usage: chaos [num_powers]'
         print(chaotic_powers(*parse(args)))
+    
+    def do_mass(self, args):
+        'usage: mass [num] [lp] [damage_resistant = 0 | 1]'
+        print(mass_combat(*parse(args)))
         
     def do_exit(self, args):
         'terminate session'
