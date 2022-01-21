@@ -4,6 +4,7 @@ import math
 import random
 import sys
 import pdb
+import traceback
 
 from const import *
 
@@ -187,4 +188,8 @@ class AnimaShell(cmd.Cmd):
         return True
 
 if __name__ == '__main__':
-    AnimaShell().cmdloop()
+    while True:
+        try:
+            AnimaShell().cmdloop()
+        except:
+            traceback.print_exc()
