@@ -2,14 +2,14 @@
 
 Utilities for playing the [Anima: Beyond Fantasy](https://tvtropes.org/pmwiki/pmwiki.php/TabletopGame/AnimaBeyondFantasy) tabletop game. This is a command line utility, and you'll need at least Python to run it.
 
-Please open an issue or contact me personally if you see any problems in the calculations. I have not extensively verified the program's results and aim to improve it as an iterative process.
+Please open an issue or contact me personally if you see any problems in the calculations. I have done my best to ensure its accuracy but I make no guarantees.
 
 ## Installation Instructions
 
 1. Install [Python](https://www.python.org/) and [Git](https://git-scm.com/) if not already installed.
 1. Use Git to [clone the repo](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
 1. Launch a [command prompt](https://www.howtogeek.com/235101/10-ways-to-open-the-command-prompt-in-windows-10/) in the repository folder, `anima`.
-1. Run `python anima-utils.py`. This will launch the command prompt.
+1. Run `python anima.py`. This will launch the command prompt.
 
 ## Usage examples
 
@@ -42,9 +42,9 @@ DAMAGE: 36
 ### crit
 
 usage: crit level phr_roll [location_id]
-* level: The level of the critical, which is the sum of the damage dealt, any critical modifier, and 1d100 rolled by the attacker.
+* level: The final level of the critical, which is the sum of the damage dealt, any critical modifier, and 1d100 rolled by the attacker.
 * phr_roll: The final result of the victim's Physical Resistance roll.
-* location_id: A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations.
+* location_id: A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations, or simply ignore the output of the program with respect to location if one has already been chosen.
 
 > Muris has just accosted a shopkeeper who was badgering him about his five-finger discount. The shopkeeper doesn't expect his swift sucker punch, so Muris succeeds in his attack and causes 50 damage. The merchant, having only 90 LP, suffers a critical blow, and two more rolls are required to determine the extent of the damage. Muris rolls 1d100 and adds it to the damage caused, and the merchant makes a Physical Resistance Check, using his PhR score of 30 as a base.
 > 
@@ -54,10 +54,10 @@ usage: crit level phr_roll [location_id]
 
 ```
 (anima) crit 120 30
-CRIT LEVEL 77
+CRIT LEVEL 90
         MAJOR CRITICAL [Left arm (Hand)]
-        ALL ACTION PENALTY (-38)
-        ALL ACTION SACRIFICE (-38)
+        ALL ACTION PENALTY (-45)
+        ALL ACTION SACRIFICE (-45)
 ```
 
 
