@@ -2,6 +2,8 @@
 
 Utilities for playing the [Anima: Beyond Fantasy](https://tvtropes.org/pmwiki/pmwiki.php/TabletopGame/AnimaBeyondFantasy) tabletop game. This is a command line utility, and you'll need at least Python to run it.
 
+Note that these calculations use the rules from the original Core rulebook, not Core Exxet. I may add support for Core Exxet in the future if I so choose.
+
 Please open an issue or contact me personally if you see any problems in the calculations. I have done my best to ensure its accuracy but I make no guarantees.
 
 ## Installation Instructions
