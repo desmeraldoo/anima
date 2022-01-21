@@ -1,16 +1,3 @@
-SHOCK_CONSEQUENCES = [
-    '\n\t-1 Mental Health',
-    '\n\t-2 Mental Health',
-    '\n\t-3 Mental Health',
-    '\n\t-5 Mental Health',
-    '\n\t-8 Mental Health',
-    '\n\t-10 Mental Health',
-    '\n\t-15 Mental Health\n\tPHYSICAL SHOCK 60',
-    '\n\t-20 Mental Health\n\tPHYSICAL SHOCK 80\n\tMINOR TEMPORARY DERANGEMENT',
-    '\n\t-30 Mental Health\n\tPHYSICAL SHOCK 100\n\tMINOR TEMPORARY DERANGEMENT',
-    '\n\t-40 Mental Health\n\tPHYSICAL SHOCK 120\n\tMAJOR TEMOPRARY DERANGEMENT',
-    '\n\t-50 Mental Health\n\tPHYSICAL SHOCK 140\n\tMAJOR TEMPORARY DERANGEMENT'
-]
 POWERS = [
     'Fatigue Resistance',
     'Acute Senses',

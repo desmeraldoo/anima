@@ -191,5 +191,7 @@ if __name__ == '__main__':
     while True:
         try:
             AnimaShell().cmdloop()
+        except KeyboardInterrupt:
+            raise SystemExit(0)
         except:
             traceback.print_exc()
