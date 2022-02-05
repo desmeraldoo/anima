@@ -1,7 +1,7 @@
 const AnimaInitiative = (() => {
   // eslint-disable-line no-unused-vars
   const ScriptName = 'AnimaInitiative';
-  const Version = '0.0.1';
+  const Version = '0.0.2';
   const HelpIconUrl =
     'https://s3.amazonaws.com/files.d20.io/images/127392204/tAiDP73rpSKQobEYm5QZUw/thumb.png?15878425385';
 
@@ -757,6 +757,7 @@ const AnimaInitiative = (() => {
                   return {
                     id: s.token.id,
                     pr: s.rollResults.total,
+                    _pageid: s.token.get('pageid'),
                     custom: ''
                   };
                 })
