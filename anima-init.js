@@ -187,7 +187,7 @@ const AnimaInitiative = (() => {
   };
   
   const rollD100 = function() {
-	return Math.floor(Math.random() * 101); 
+	return Math.floor(Math.random() * 100) + 1
   };
   
   const autoOpenRoll = function(roll, threshold) {
