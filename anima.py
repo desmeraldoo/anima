@@ -27,7 +27,7 @@ def calc_damage_multiple(result, armor):
                 else:
                     return 0.2
         else:
-            return ((result // 10) / 10) - (armor * 0.1)
+            return round(((result // 10) / 10) - (armor * 0.1), 1)
     else:
         return 0
 
@@ -185,7 +185,7 @@ class AnimaShell(cmd.Cmd):
     def do_exit(self, args):
         'terminate session'
         print('Ending session')
-        return True
+        raise KeyboardInterrupt
 
 if __name__ == '__main__':
     while True:
