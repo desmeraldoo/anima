@@ -27,7 +27,7 @@ def calc_damage_multiple(result, armor):
                 else:
                     return 0.2
         else:
-            return round(((result // 10) / 10) - (armor * 0.1), 1)
+            return round(((result // 10) / 10) - (min(armor, 10) * 0.1), 1)
     else:
         return 0
 
@@ -162,8 +162,8 @@ class AnimaShell(cmd.Cmd):
     def default(self, _):
         print('Input not recognized.')
     
-    def do_attack(self, args):
-        'usage: attack attack_roll defense_roll [armor] [base_damage]'
+    def do_atk(self, args):
+        'usage: atk attack_roll defense_roll [armor] [base_damage]'
         print(calc_attack(*parse(args)))
         
     def do_combo(self, args):
