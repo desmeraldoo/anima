@@ -22,10 +22,11 @@ Optional arguments for every command must be specified in order. That is to say,
 ### attack
 
 usage: attack attack_roll defense_roll [armor] [base_damage]
-* attack_roll: The result of the attacker's offensive roll (the sum of their Attack modifier and 1d100).
-* defense_roll: The result of the defender's defensive roll (the sum of their Defense modifier and 1d100).
-* armor: The relevant AT, given as an integer
-* base_damage: The base damage of the weapon used by the attacker, if known or relevant.
+
+- attack_roll: The result of the attacker's offensive roll (the sum of their Attack modifier and 1d100).
+- defense_roll: The result of the defender's defensive roll (the sum of their Defense modifier and 1d100).
+- armor: The relevant AT, given as an integer
+- base_damage: The base damage of the weapon used by the attacker, if known or relevant.
 
 > For example, Celia attacks one of the guards with whom she was earlier locked in combat. Celia now has an Attack Ability of 120, while the guard’s Dodge is only 60. Both of them roll the dice. Celia rolls an 86, which, added to her Ability, gives her a Final Attack of 206. The guard’s dice roll is a 44, and so his Final Defense is 104. As Celia is the attacker, the guard’s Final Defense is subtracted from Celia’s Final Attack (206 – 104). The result used when referencing Table 38 is, therefore, 102.
 
@@ -44,14 +45,15 @@ DAMAGE: 36
 ### crit
 
 usage: crit level phr_roll [location_id]
-* level: The final level of the critical, which is the sum of the damage dealt, any critical modifier, and 1d100 rolled by the attacker.
-* phr_roll: The final result of the victim's Physical Resistance roll.
-* location_id: A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations, or simply ignore the output of the program with respect to location if one has already been chosen.
+
+- level: The final level of the critical, which is the sum of the damage dealt, any critical modifier, and 1d100 rolled by the attacker.
+- phr_roll: The final result of the victim's Physical Resistance roll.
+- location_id: A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations, or simply ignore the output of the program with respect to location if one has already been chosen.
 
 > Muris has just accosted a shopkeeper who was badgering him about his five-finger discount. The shopkeeper doesn't expect his swift sucker punch, so Muris succeeds in his attack and causes 50 damage. The merchant, having only 90 LP, suffers a critical blow, and two more rolls are required to determine the extent of the damage. Muris rolls 1d100 and adds it to the damage caused, and the merchant makes a Physical Resistance Check, using his PhR score of 30 as a base.
-> 
+>
 > Muris rolls 70, and the merchant rolls only 13, so this is a dire blow with a critical level of 77. The GM rolls to determine the location of the critical, and their roll yields a 67, or the merchants left hand, which seems to have been badly broken in his failed attempt to block the strike.
-> 
+>
 > Thus, in addition to the damage he received, the merchant suffers not only a -38 All Action Penalty that diminishes at a rate of 5 points per round for the duration of the encounter, but an additional -38 All Action Penalty that heals at a rate dependent on his Constitution, normally 5 points per day (see the core book, page 53). At the discretion of the GM, he may require further medical attention to heal and regain use of his hand. Though, perhaps he should count himself fortunate in one respect—if Muris's critical roll been just 25 points higher, the hand would have been crushed beyond repair.
 
 ```
@@ -61,5 +63,3 @@ CRIT LEVEL 90
         ALL ACTION PENALTY (-45)
         ALL ACTION SACRIFICE (-45)
 ```
-
-
