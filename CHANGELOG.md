@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.4
+
+- Correct method of adding `tabulate` to dependencies in `pyproject.toml`
+
 ## 0.1.3
 
 - Update project name to `anima-utils` to avoid conflict on PyPI
