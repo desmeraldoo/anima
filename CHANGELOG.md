@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.3
+
+- Update project name to `anima-utils` to avoid conflict on PyPI
+
+## 0.1.2
+
+- Add `tabulate` to dependencies in `pyproject.toml`
+
+## 0.1.1
+
+- Update [documentation](README.md)
+
 ## 0.1.0
 
 - Refurbish combo command to help with complicated multiattack scenarios

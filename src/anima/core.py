@@ -279,7 +279,7 @@ def shuffle(targets: list[str]) -> str:
 
 
 class AnimaShell(cmd.Cmd):
-    intro = f"Engaging Anima toolkit (v{version('anima')})"
+    intro = f"Engaging Anima toolkit (v{version('anima-utils')})"
     prompt = "(anima) "
 
     def default(self, _: str) -> None:
