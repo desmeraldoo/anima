@@ -4,12 +4,9 @@ requires = [
 ]
 build-backend = "setuptools.build_meta"
 
-[console_scripts]
-anima = "anima.core:main"
-
 [project]
 name = "anima"
-version = "0.1.0"
+version = "0.1.1"
 authors = [
   { name="Dez", email="desmeraldoo@gmail.com" },
 ]
@@ -21,6 +18,9 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
+
+[project.scripts]
+anima = "anima.core:main"
 
 [project.urls]
 Homepage = "https://github.com/desmeraldoo/anima"

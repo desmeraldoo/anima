@@ -5,6 +5,7 @@ import random
 import traceback
 from bdb import BdbQuit
 from dataclasses import dataclass, field
+from importlib.metadata import version
 from typing import Final
 
 from tabulate import tabulate
@@ -112,19 +113,16 @@ def calc_combo() -> str:
     attacks, defenses, armor and damage values. By its nature, requires
     additional input from the user.
 
-    Example of a combo of a Limited Additional Attack +4, Damage Augmentation (Single) +100 combo against a DR creature:
-    ```
-        atks:   150 160 170 180 190
-        defs:
-        amrs:   10
-        dmgs:   50 . . . 150
-
-    ```
+    Consult the project's documentation for usage examples.
     """
-    atks_input = [_ for _ in input("atks:\t").split(" ") if _ != ""]
-    defs_input = [_ for _ in input("defs:\t").split(" ") if _ != ""]
-    amrs_input = [_ for _ in input("amrs:\t").split(" ") if _ != ""]
-    dmgs_input = [_ for _ in input("dmgs:\t").split(" ") if _ != ""]
+
+    try:
+        atks_input = [_ for _ in input("atks:\t").split(" ") if _ != ""]
+        defs_input = [_ for _ in input("defs:\t").split(" ") if _ != ""]
+        amrs_input = [_ for _ in input("amrs:\t").split(" ") if _ != ""]
+        dmgs_input = [_ for _ in input("dmgs:\t").split(" ") if _ != ""]
+    except KeyboardInterrupt:  # Lets the user exit out of the `combo` prompt without exiting the CLI entirely.
+        pass
 
     # Extends each list to be the length of the longest list by filling in later positions with `None`
     atks_extended, defs_extended, amrs_extended, dmgs_extended = map(
@@ -169,7 +167,7 @@ def calc_combo() -> str:
     )
     total_table = tabulate([[total]], headers=["Total"], tablefmt="fancy_grid")
 
-    return f"{resolution_table}\n{total_table}"
+    return f"\n{resolution_table}\n{total_table}"
 
 
 def calc_crit(level: int, phr_roll: int, location_id: int = 0) -> str:
@@ -281,7 +279,7 @@ def shuffle(targets: list[str]) -> str:
 
 
 class AnimaShell(cmd.Cmd):
-    intro = "Engaging Anima toolkit"
+    intro = f"Engaging Anima toolkit (v{version('anima')})"
     prompt = "(anima) "
 
     def default(self, _: str) -> None:
@@ -292,7 +290,7 @@ class AnimaShell(cmd.Cmd):
         print(calc_attack(*parse(args)))
 
     def do_combo(self, _: str) -> None:
-        "usage: combo\nNOTE: This is an interactive command with multiple inputs. It does not accept arguments.\nNOTE: Remember that combos can be interrupted if a counterattack presents itself, or by other means."
+        "usage: combo"
         print(calc_combo())
 
     def do_crit(self, args: str) -> None:

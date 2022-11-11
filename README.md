@@ -1,32 +1,42 @@
 # Anima Utilities
 
-Utilities for playing the [Anima: Beyond Fantasy](https://tvtropes.org/pmwiki/pmwiki.php/TabletopGame/AnimaBeyondFantasy) tabletop game. This is a command line utility, and you'll need at least Python to run it.
+Command line utilities for playing the [Anima: Beyond Fantasy](https://tvtropes.org/pmwiki/pmwiki.php/TabletopGame/AnimaBeyondFantasy) tabletop game.
 
-Note that these calculations use the rules from the original Core rulebook, not Core Exxet. I may add support for Core Exxet in the future if I so choose.
+Note that these calculations are not guaranteed to be from either the Core rulebook or the updated version, Core Exxet. I believe that I'm using the damage formula from Core Exxet. If you see a problem, [open an issue](https://github.com/desmeraldoo/anima/issues/new).
 
-Please open an issue or contact me personally if you see any problems in the calculations. I have done my best to ensure its accuracy but I make no guarantees.
+## Installation
 
-## Installation Instructions
+### From Pypi
 
 1. Install [Python](https://www.python.org/) and [Git](https://git-scm.com/) if not already installed.
+1. Run `pip install anima` to install the program.
+1. Run `anima` to open the command prompt.
+
+### From Source
+
 1. Use Git to [clone the repo](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
 1. Launch a [command prompt](https://www.howtogeek.com/235101/10-ways-to-open-the-command-prompt-in-windows-10/) in the repository folder, `anima`.
-1. Run `python anima.py`. This will launch the command prompt.
+1. Run `python install .`, which will build and install the package and add the `anima` command to your system.
+1. Run `anima` to open the command prompt.
 
-## Usage examples
+If you have any problems following the steps above, [open an issue](https://github.com/desmeraldoo/anima/issues/new).
 
-Below are several examples of using the commands, given examples from the Anima: Beyond Fantasy core book or illustrative examples I created.
+## Documentation
 
-Optional arguments for every command must be specified in order. That is to say, for the `attack` command, you cannot specify `base_damage` without also specifying `armor`, even if `armor` is just 0.
+The below demonstrations of how to use the commands use examples from the *Anima: Beyond Fantasy* core book or original illustrative examples.
 
-### attack
+### atk
 
-usage: attack attack_roll defense_roll [armor] [base_damage]
+Resolves an attack and defense exchange.
 
-- attack_roll: The result of the attacker's offensive roll (the sum of their Attack modifier and 1d100).
-- defense_roll: The result of the defender's defensive roll (the sum of their Defense modifier and 1d100).
-- armor: The relevant AT, given as an integer
-- base_damage: The base damage of the weapon used by the attacker, if known or relevant.
+`usage: atk attack_roll defense_roll armor_value base_damage`
+
+| field        | type | default | description                                                               |
+| ------------ | ---- | ------- | ------------------------------------------------------------------------- |
+| attack_roll  | int  | 0       | The final result of the attacker's offensive roll.                        |
+| defense_roll | int  | 0       | The final result of the defender's defensive roll.                        |
+| attack_roll  | int  | 0       | The defender's Armor on the Table corresponding to the attacker's attack. |
+| attack_roll  | int  | 0       | The base damage of the weapon used by the attacker, if known or relevant. |
 
 > For example, Celia attacks one of the guards with whom she was earlier locked in combat. Celia now has an Attack Ability of 120, while the guard’s Dodge is only 60. Both of them roll the dice. Celia rolls an 86, which, added to her Ability, gives her a Final Attack of 206. The guard’s dice roll is a 44, and so his Final Defense is 104. As Celia is the attacker, the guard’s Final Defense is subtracted from Celia’s Final Attack (206 – 104). The result used when referencing Table 38 is, therefore, 102.
 
@@ -42,13 +52,101 @@ ATTACK: 100%
 DAMAGE: 36
 ```
 
+### combo
+
+Enters a special interactive mode where the user can specify multiple attacks and resolve them all at once.
+
+There is no need to enter the total number of attacks up front. The longest list is taken as the true number of attacks. Blanks are replaced with zero, and `'.'` values are replaced with the closest preceding non-null value, or zero, in the absence of any such value.
+
+`usage: combo`
+
+```
+(anima) combo
+atks:   150 180 170 210
+defs:   160 120 200 130
+amrs:   2 4 6 8
+dmgs:   100 80 60 40
+
+╒══════╤══════════╤═══════════╤═════════╤═══════════════╤══════════════════════╤══════════╕
+│   id │   attack │   defense │   armor │   base_damage │ result               │   damage │
+╞══════╪══════════╪═══════════╪═════════╪═══════════════╪══════════════════════╪══════════╡
+│    0 │      150 │       160 │       2 │           100 │ COUNTERATTACK: +5 C  │        0 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼──────────────────────┼──────────┤
+│    1 │      180 │       120 │       4 │            80 │ DAMAGE: 16           │       16 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼──────────────────────┼──────────┤
+│    2 │      170 │       200 │       6 │            60 │ COUNTERATTACK: +15 C │        0 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼──────────────────────┼──────────┤
+│    3 │      210 │       130 │       8 │            40 │ MISSED               │        0 │
+╘══════╧══════════╧═══════════╧═════════╧═══════════════╧══════════════════════╧══════════╛
+╒═════════╕
+│   Total │
+╞═════════╡
+│      16 │
+╘═════════╛
+```
+
+```
+(anima) combo
+atks:   150 160 170 180
+defs:
+amrs:   10
+dmgs:   50 . . 150
+
+╒══════╤══════════╤═══════════╤═════════╤═══════════════╤═════════════╤══════════╕
+│   id │   attack │   defense │   armor │   base_damage │ result      │   damage │
+╞══════╪══════════╪═══════════╪═════════╪═══════════════╪═════════════╪══════════╡
+│    0 │      150 │         0 │      10 │            50 │ DAMAGE: 25  │       25 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼─────────────┼──────────┤
+│    1 │      160 │         0 │      10 │            50 │ DAMAGE: 30  │       30 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼─────────────┼──────────┤
+│    2 │      170 │         0 │      10 │            50 │ DAMAGE: 35  │       35 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼─────────────┼──────────┤
+│    3 │      180 │         0 │      10 │           150 │ DAMAGE: 120 │      120 │
+╘══════╧══════════╧═══════════╧═════════╧═══════════════╧═════════════╧══════════╛
+╒═════════╕
+│   Total │
+╞═════════╡
+│     210 │
+╘═════════╛
+```
+
+```
+(anima) combo
+atks:   280
+defs:   140 180 320 150
+amrs:   . . . 8
+dmgs:   100
+
+╒══════╤══════════╤═══════════╤═════════╤═══════════════╤══════════════════════╤══════════╕
+│   id │   attack │   defense │   armor │   base_damage │ result               │   damage │
+╞══════╪══════════╪═══════════╪═════════╪═══════════════╪══════════════════════╪══════════╡
+│    0 │      280 │       140 │       0 │           100 │ DAMAGE: 140          │      140 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼──────────────────────┼──────────┤
+│    1 │      280 │       180 │       0 │           100 │ DAMAGE: 100          │      100 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼──────────────────────┼──────────┤
+│    2 │      280 │       320 │       0 │           100 │ COUNTERATTACK: +20 C │        0 │
+├──────┼──────────┼───────────┼─────────┼───────────────┼──────────────────────┼──────────┤
+│    3 │      280 │       150 │       8 │           100 │ DAMAGE: 50           │       50 │
+╘══════╧══════════╧═══════════╧═════════╧═══════════════╧══════════════════════╧══════════╛
+╒═════════╕
+│   Total │
+╞═════════╡
+│     290 │
+╘═════════╛
+```
+
 ### crit
 
-usage: crit level phr_roll [location_id]
+Calculates the effects of a critical, or reports that a critical has no effects. If the critical involves amputation, the location is randomly chosen unless specified (by an integer value corresponding to Table 48 of the core book).
 
-- level: The final level of the critical, which is the sum of the damage dealt, any critical modifier, and 1d100 rolled by the attacker.
-- phr_roll: The final result of the victim's Physical Resistance roll.
-- location_id: A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations, or simply ignore the output of the program with respect to location if one has already been chosen.
+`usage: crit level phr_roll location_id`
+
+| field       | type | default | description                                                                                                                                                                                                                                                                                   |
+| ----------- | ---- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| level       | int  | 0       | The damage dealt by the attack that triggered the critical roll, plus 1d100 rolled by the attacker. Note that if this value is over 200, the script automatically reduces the value in excess of 200 by half, per the rules for criticals given in the core book.                             |
+| phr_roll    | int  | 0       | The final result of the victim's Physical Resistance roll.                                                                                                                                                                                                                                    |
+| attack_roll | int  | 0       | The defender's Armor on the Table corresponding to the attacker's attack.                                                                                                                                                                                                                     |
+| location_id | int  | 0       | A way of specifying the location of the critical, if for example the attacker was targeting a specific region of the body. See Table 48 on Page 90 of the core book to look up locations, or simply ignore the output of the program with respect to location if one has already been chosen. |
 
 > Muris has just accosted a shopkeeper who was badgering him about his five-finger discount. The shopkeeper doesn't expect his swift sucker punch, so Muris succeeds in his attack and causes 50 damage. The merchant, having only 90 LP, suffers a critical blow, and two more rolls are required to determine the extent of the damage. Muris rolls 1d100 and adds it to the damage caused, and the merchant makes a Physical Resistance Check, using his PhR score of 30 as a base.
 >
