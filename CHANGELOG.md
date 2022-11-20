@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.2.0
+
+- Remove auto-cap of Armor Value to accommodate Armor Values above 10
+- `atk` and its dependencies now only report `"MISSED"` if the attack missed due to Absorption
+  - Previously, it would report `"MISSED"` if the damage was perfectly nullfied by Armor without being reduced into the negative range
+
 ## 0.1.4
 
 - Correct method of adding `tabulate` to dependencies in `pyproject.toml`

@@ -9,12 +9,12 @@ Note that these calculations are not guaranteed to be from either the Core ruleb
 ### From Pypi
 
 1. Install [Python](https://www.python.org/) and [Git](https://git-scm.com/) if not already installed.
-1. Run `pip install anima` to install the program.
-1. Run `anima` to open the command prompt.
+1. Run `pip install anima-utils` to install the program.
+1. Run the command `anima` to open the Anima Utils CLI.
 
 ### From Source
 
-1. Use Git to [clone the repo](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository).
+1. Use Git to [clone](https://docs.github.com/en/free-pro-team@latest/github/creating-cloning-and-archiving-repositories/cloning-a-repository) the [repo](https://github.com/desmeraldoo/anima).
 1. Launch a [command prompt](https://www.howtogeek.com/235101/10-ways-to-open-the-command-prompt-in-windows-10/) in the repository folder, `anima`.
 1. Run `python install .`, which will build and install the package and add the `anima` command to your system.
 1. Run `anima` to open the command prompt.

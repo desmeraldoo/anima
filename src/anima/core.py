@@ -12,6 +12,7 @@ from tabulate import tabulate
 
 from anima.const import POWERS
 
+ABSORPTION: Final[int] = 30
 DUPLICATE_MARKER: Final[str] = "."
 
 
@@ -71,7 +72,7 @@ def calc_damage_multiple(result: int, armor: int) -> float:
                 else:
                     return 0.2
         else:
-            return round(((result // 10) / 10) - (min(armor, 10) * 0.1), 1)
+            return round(((result // 10) / 10) - (armor * 0.1), 1)
     else:
         return 0
 
@@ -84,11 +85,10 @@ def calc_attack(
         counterattack_bonus = -result // 10 * 5
         return f"COUNTERATTACK: +{counterattack_bonus} C"
 
-    damage_multiple = calc_damage_multiple(result, armor)
-    if damage_multiple < 0:
-        return "DEFLECTED"
-    elif damage_multiple == 0:
+    if result < ABSORPTION:
         return "MISSED"
+    elif (damage_multiple := calc_damage_multiple(result, armor)) <= 0:
+        return "DEFLECTED"
     elif not base_damage:
         return f"ATTACK: {int(damage_multiple * 100)}%"
     else:
