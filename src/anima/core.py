@@ -124,7 +124,8 @@ def calc_combo() -> str:
     except KeyboardInterrupt:  # Lets the user exit out of the `combo` prompt without exiting the CLI entirely.
         pass
 
-    # Extends each list to be the length of the longest list by filling in later positions with `None`
+    # Extends each list to be the length of the longest list by filling in later positions with `None`,
+    # then converts back to individual lists instead of a `zip_longest` object
     atks_extended, defs_extended, amrs_extended, dmgs_extended = map(
         list,
         zip(
