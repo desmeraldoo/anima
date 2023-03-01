@@ -68,6 +68,9 @@ repos:
     args:
     - --unittest
   - id: no-commit-to-branch  # - don't commit to branch
+    args:
+    - --branch
+    - main
   - id: requirements-txt-fixer  # - sorts entries in requirements.txt.
   - id: sort-simple-yaml  # - sorts simple yaml files which consist only of top-level keys, preserving comments and blocks.
   - id: trailing-whitespace  # - trims trailing whitespace.
