@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.0
+
+- Rename the `chaos` command to the `powers` command
+- Add powers from the book "Those Who Walked Amongst Us" to the `powers` command
+- Fix `combo` algorithm boolean logic
+- Fix `combo` posting a stacktrace on keyboard interrupt
+
 ## 0.2.0
 
 - Remove auto-cap of Armor Value to accommodate Armor Values above 10

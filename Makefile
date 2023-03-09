@@ -3,6 +3,7 @@ requirements:
 
 development: requirements
 	pip install -r dev-requirements.txt
+	pip install -e . --force-reinstall
 
 test:
 	python -m pytest -vv --cov src
