@@ -20,7 +20,7 @@ description = "Utils for assisting players and GMs in the tabletop roleplaying g
 name = "anima-utils"
 readme = "README.md"
 requires-python = ">=3.10"
-version = "0.3.0"
+version = "0.3.1"
 
 [project.scripts]
 anima = "anima.core:main"

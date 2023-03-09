@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.1
+
+- Fix tests import error caused by a lack of attention to detail
+
 ## 0.3.0
 
 - Rename the `chaos` command to the `powers` command
