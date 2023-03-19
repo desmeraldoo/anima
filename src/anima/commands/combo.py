@@ -33,7 +33,7 @@ class AttackResolver:
         self.result = calc_attack(
             self.attack, self.defense, self.armor, self.base_damage
         )
-        if self.result in ["ATTACK", "DAMAGE"]:
+        if "ATTACK" in self.result or "DAMAGE" in self.result:
             damage_percentage = calc_damage_multiple(
                 self.attack - self.defense, self.armor
             )

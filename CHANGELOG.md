@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.2
+
+- Fix `AttackResolver` not properly calculating damage
+
 ## 0.3.1
 
 - Fix tests import error caused by a lack of attention to detail
