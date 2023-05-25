@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.0
+
+- Convert to Pleroma toolkit
+
 ## 0.3.2
 
 - Fix `AttackResolver` not properly calculating damage
