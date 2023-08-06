@@ -733,33 +733,6 @@ const AnimaInitiative = (() => {
     sendChat("", '/w "' + who + '" ' + helpParts.helpChat(context));
   };
 
-  const parseEmbeddedStatReferences = function (stat, charObj) {
-    let charName = charObj.get("name"),
-      stext = (stat + "")
-        .replace(/@{[^}]*}/g, (s) => {
-          let parts = _.rest(s.match(/@{([^|}]*)\|?([^|}]*)\|?([^|}]*)}/)),
-            statName,
-            modName;
-          if (parts[2].length) {
-            statName = parts[1];
-            modName = parts[2];
-          } else if (parts[1].length) {
-            if (_.contains(["max", "current"], parts[1])) {
-              statName = parts[0];
-              modName = parts[1];
-            } else {
-              statName = parts[1];
-            }
-          } else {
-            statName = parts[0];
-          }
-
-          return `@{${charName}|${statName}${modName ? `|${modName}` : ""}}`;
-        })
-        .replace(/&{tracker}/, "");
-    return stext;
-  };
-
   const findCharacterOpenRoll = (character) => {
     return character
       ? parseInt(getAttrByName(character.id, CharacterSuccessAttribute))
@@ -810,7 +783,7 @@ const AnimaInitiative = (() => {
     let rollSetup = ids
       .filter((id) => !turnorderIDS.includes(id))
       .map((id) => getObj("graphic", id))
-      .filter((g) => undefined !== g)
+      .filter((g) => undefined !== g && g.get("represents") !== "")
       .map((g) => ({
         token: g,
         character: getObj("character", g.get("represents")),
@@ -957,9 +930,6 @@ const AnimaInitiative = (() => {
       prev = Campaign().get("turnorder"),
       args,
       cmds,
-      workgroup,
-      workvar,
-      error = false,
       cont = false,
       manualBonus = 0,
       manualBonusMin = 0,
