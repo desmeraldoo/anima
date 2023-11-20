@@ -218,7 +218,6 @@ const AnimaInitiative = (() => {
       lastRoll = rollD100();
       bonus += lastRoll;
       span += lastRoll.toString() + " + ";
-      threshold = threshold >= 100 ? threshold : threshold + 1;
     }
     span = span.slice(0, -3);
     span += "</span>) [open roll]";
